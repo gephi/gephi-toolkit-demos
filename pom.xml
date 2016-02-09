@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.gephi</groupId>
+    <artifactId>toolkit-demos</artifactId>
+    <version>0.9.0</version>
+    <packaging>jar</packaging>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>netbeans</id>
+            <name>NetBeans</name>
+            <url>http://bits.netbeans.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>oss-sonatype</id>
+            <name>oss-sonatype</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <!--        <repository>
+            <id>gephi-releases</id>
+            <name>Gephi Releases</name>
+            <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
+        </repository>-->
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>gephi-toolkit</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>graphstore</artifactId>
+            <version>0.5.2-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+</project>
