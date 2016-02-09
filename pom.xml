@@ -4,7 +4,7 @@
 
     <groupId>org.gephi</groupId>
     <artifactId>toolkit-demos</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -25,11 +25,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <!--        <repository>
-            <id>gephi-releases</id>
-            <name>Gephi Releases</name>
-            <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
-        </repository>-->
     </repositories>
 
     <dependencies>
@@ -37,11 +32,6 @@
             <groupId>org.gephi</groupId>
             <artifactId>gephi-toolkit</artifactId>
             <version>0.9.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gephi</groupId>
-            <artifactId>graphstore</artifactId>
-            <version>0.5.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
