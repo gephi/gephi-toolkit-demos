@@ -22,6 +22,8 @@ package org.gephi.toolkit.demos;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import javax.swing.JFrame;
 import org.gephi.io.importer.api.Container;
@@ -67,14 +69,12 @@ public class PreviewJFrame {
         previewModel.getProperties().putValue(PreviewProperty.NODE_LABEL_COLOR, new DependantOriginalColor(Color.WHITE));
         previewModel.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.FALSE);
         previewModel.getProperties().putValue(PreviewProperty.EDGE_OPACITY, 50);
-        previewModel.getProperties().putValue(PreviewProperty.EDGE_RADIUS, 10f);
         previewModel.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.BLACK);
 
         //New Processing target, get the PApplet
         G2DTarget target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
-        PreviewSketch previewSketch = new PreviewSketch(target);
+        final PreviewSketch previewSketch = new PreviewSketch(target);
         previewController.refreshPreview();
-        previewSketch.resetZoom();
 
         //Add the applet to a JFrame and display
         JFrame frame = new JFrame("Test Preview");
@@ -84,6 +84,14 @@ public class PreviewJFrame {
         frame.add(previewSketch, BorderLayout.CENTER);
 
         frame.setSize(1024, 768);
+        
+        //Wait for the frame to be visible before painting, or the result drawing will be strange
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                previewSketch.resetZoom();
+            }
+        });
         frame.setVisible(true);
     }
 
