@@ -11,7 +11,7 @@ The toolkit is just a single JAR that anyone could reuse in a Java program. This
 - Run demos by calling script() method.
 - Change the main class to execute a demo
 
-Consult the Gephi Toolkit [Javadoc](https://gephi.org/gephi-toolkit/0.9.0/apidocs/) for help.
+Consult the Gephi Toolkit [Javadoc](https://gephi.org/gephi-toolkit/0.9.2/apidocs/) for help.
 
 ## References:
 
