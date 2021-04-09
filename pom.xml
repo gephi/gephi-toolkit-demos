@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.gephi</groupId>
     <artifactId>toolkit-demos</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.3</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -12,11 +11,6 @@
     </properties>
 
     <repositories>
-        <repository>
-            <id>netbeans</id>
-            <name>NetBeans</name>
-            <url>http://bits.netbeans.org/maven2/</url>
-        </repository>
         <repository>
             <id>oss-sonatype</id>
             <name>oss-sonatype</name>
@@ -29,9 +23,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.netbeans</groupId>
+            <artifactId>netbeans-parent</artifactId>
+            <version>2</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
             <groupId>org.gephi</groupId>
             <artifactId>gephi-toolkit</artifactId>
-            <version>${project.version}</version>
+            <version>0.9.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
