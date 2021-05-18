@@ -1,3 +1,6 @@
+# What is this repo?
+I forked the official Gephi toolkit example code. This will contain modified version of one of the examples upon completion that imports a graph and exports it to a PDF.
+
 # Gephi Toolkit Demos
 
 The Gephi Toolkit project package essential modules (Graph, Layout, Filters, IO...) in a standard Java library, which any Java project can use for getting things done.
