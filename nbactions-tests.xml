@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath org.gephi.toolkit.demos.Main /org/gephi/toolkit/demos/lesmiserables.gml test_1.pdf false false</exec.args>
+                <exec.args>-classpath %classpath org.gephi.toolkit.demos.GraphPlotTest -X</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/home/henry/bii/cines_repos/gephi-toolkit-demos</exec.workingdir>
             </properties>
@@ -25,7 +25,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath org.gephi.toolkit.demos.Main /org/gephi/toolkit/demos/lesmiserables.gml test_1.pdf false false</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath org.gephi.toolkit.demos.GraphPlotTest -X</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir>/home/henry/bii/cines_repos/gephi-toolkit-demos</exec.workingdir>
@@ -41,7 +41,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath org.gephi.toolkit.demos.Main /org/gephi/toolkit/demos/lesmiserables.gml test_1.pdf false false</exec.args>
+                <exec.args>-classpath %classpath org.gephi.toolkit.demos.GraphPlotTest -X</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/home/henry/bii/cines_repos/gephi-toolkit-demos</exec.workingdir>
             </properties>

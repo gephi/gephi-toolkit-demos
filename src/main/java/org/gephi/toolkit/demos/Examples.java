@@ -20,7 +20,7 @@ along with Gephi.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gephi.toolkit.demos;
 
-public class Main {
+public class Examples {
 
     public static void main(String[] args) {
         /*
@@ -31,22 +31,16 @@ public class Main {
         It requires an argument on whether or not to fill in missing
         nodes.
         */
-        String inputPath = args[0];
-        String outputPath = args[1];
-        boolean directed = false, autoCreateNodes = false;
-        if (args.length > 3)  {
-        directed = java.lang.Boolean.parseBoolean(args[2]);
-        autoCreateNodes = java.lang.Boolean.parseBoolean(args[3]);
-        }
-        
-        
-        
-        GraphPlot graphPlot;
-
-        graphPlot = new GraphPlot(inputPath,
-        outputPath, directed, autoCreateNodes);
-
+        GraphPlot graphPlot = new GraphPlot("/org/gephi/toolkit/demos/lesmiserables.gml",
+         "test_1.pdf");
         graphPlot.script();
         
+//        graphPlot = new GraphPlot("/org/gephi/toolkit/demos/lesmiserables.sqlite3",
+//        "test_2.pdf");  
+//        graphPlot.script();
+        
+        graphPlot = new GraphPlot("/org/gephi/toolkit/demos/PowerGrid.gml",
+        "test_3.pdf");  
+        graphPlot.script();
     }
 }
