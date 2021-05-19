@@ -40,21 +40,45 @@ import org.openide.util.Lookup;
 import java.nio.file.Files;
 
 /**
- * This demo focuses on Import and Export features, showing different IO
- * possibilities.
+ * This class is used to take an acceptable input to the Gephi Toolkit and plot
+ * it to a PDF.
  * <p>
  * Import can be performed from a file, database or Reader/InputStream. The
- * export can be done to files and Writer/OutputStream. The demo import a file
- * and shows how to configure graph export to use the visible graph instead of
- * the full graph. That is essential to export a graph that has been filtered.
+ * export should be done to a PDF file. There are several options that dictate
+ * how the plot is done.
  * <p>
  * The ability to export graph or PDF to Writer or Byte array is showed at the
  * end.
  *
- * @author Mathieu Bastian
+ * @author Henry Carscadden
+ * @version 0.1
+ * Credits to Mathieu Bastian for providing the code example that this is based
+ * on.
  */
-public class ImportExport {
-
+public class GraphPlot {
+    private String inputPath, outputPath;
+    private boolean directed, autoCreateNodes;
+    
+    public GraphPlot(String inputPath, String outputPath){
+        this.inputPath = inputPath;
+        this.outputPath = outputPath;
+        
+        // Default to undirected and not auto-creating missing nodes.
+        this.directed = false;
+        this.autoCreateNodes = false;
+    }
+    
+    
+    public GraphPlot(String inputPath, String outputPath, boolean directed,
+            boolean autoCreateNodes){
+        
+        this.inputPath = inputPath;
+        this.outputPath = outputPath;
+        this.directed = this.directed;
+        this.autoCreateNodes = this.autoCreateNodes;
+    }
+    
+    
     public void script() {
         //Init a project - and therefore a workspace
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
@@ -67,44 +91,27 @@ public class ImportExport {
         //Import file
         Container container;
         try {
-            File file = new File(getClass().getResource("/org/gephi/toolkit/demos/lesmiserables.gml").toURI());
+            File file = new File(getClass().getResource(this.inputPath).toURI());
             container = importController.importFile(file);
-            container.getLoader().setEdgeDefault(EdgeDirectionDefault.DIRECTED);   //Force DIRECTED
-            container.getLoader().setAllowAutoNode(false);  //Don't create missing nodes
+            if (this.directed){
+                container.getLoader().setEdgeDefault(EdgeDirectionDefault.DIRECTED);   //Force DIRECTED
+            }
+            else{
+                container.getLoader().setEdgeDefault(EdgeDirectionDefault.UNDIRECTED);
+            }
+            container.getLoader().setAllowAutoNode(this.autoCreateNodes);  // Create missing nodes according to the input arguments.
+            //Append imported data to GraphAPI
+            importController.process(container, new DefaultProcessor(), workspace);
+
         } catch (Exception ex) {
             ex.printStackTrace();
-            return;
+            System.out.println("Reading input graph file " + this.inputPath + " failed.");
+            System.exit(1);
         }
 
-        //Append imported data to GraphAPI
-        importController.process(container, new DefaultProcessor(), workspace);
-
+        
         //Export full graph
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
-//        try {
-//            ec.exportFile(new File("io_gexf.gexf"));
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//            return;
-//        }
-
-//        //Export only visible graph
-//        GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");     //Get GEXF exporter
-//        exporter.setExportVisible(true);  //Only exports the visible (filtered) graph
-//        exporter.setWorkspace(workspace);
-//        try {
-//            ec.exportFile(new File("io_gexf.gexf"), exporter);
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//            return;
-//        }
-//
-//        //Export to Writer
-//        Exporter exporterGraphML = ec.getExporter("graphml");     //Get GraphML exporter
-//        exporterGraphML.setWorkspace(workspace);
-//        StringWriter stringWriter = new StringWriter();
-//        ec.exportWriter(stringWriter, (CharacterExporter) exporterGraphML);
-//        //System.out.println(stringWriter.toString());   //Uncomment this line
 
         //PDF Exporter config and export to Byte array
         PDFExporter pdfExporter = (PDFExporter) ec.getExporter("pdf");
@@ -113,15 +120,17 @@ public class ImportExport {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ec.exportStream(baos, pdfExporter);
         byte[] pdf = baos.toByteArray();
+        
+        // Write byte-array to the specified PDF file.
         try{
-        File outputFile = new File("outputFile.pdf");
+        File outputFile = new File(this.outputPath);
         Files.write(outputFile.toPath(), pdf);
         }
         catch (IOException ex){
             ex.printStackTrace();
-            return;
+            System.out.println("Writing PDF plot to " + this.outputPath + " failed.");
+            System.exit(1);
         }
-//        outputStream.write(pdf);
         
     }
 }

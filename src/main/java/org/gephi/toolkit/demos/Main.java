@@ -23,41 +23,17 @@ package org.gephi.toolkit.demos;
 public class Main {
 
     public static void main(String[] args) {
+        /*
+        This class performs the actual import/export.
+        It requires the path to the input file.
+        It requires the path to export the PDF image to.
+        It requires an argument to determine the directedness.
+        It requires an argument on whether or not to fill in missing
+        nodes.
+        */
+        GraphPlot graphPlot = new GraphPlot("/org/gephi/toolkit/demos/lesmiserables.gml",
+         "test.pdf");
+        graphPlot.script();
 
-//        HeadlessSimple headlessSimple = new HeadlessSimple();
-//        headlessSimple.script();
-//
-//        WithAutoLayout autoLayout = new WithAutoLayout();
-//        autoLayout.script();
-//
-//        ParallelWorkspace parallelWorkspace = new ParallelWorkspace();
-//        parallelWorkspace.script();
-//
-//        PartitionGraph partitionGraph = new PartitionGraph();
-//        partitionGraph.script();
-//
-//        RankingGraph rankingGraph = new RankingGraph();
-//        rankingGraph.script();
-//
-//        Filtering filtering = new Filtering();
-//        filtering.script();
-
-        ImportExport importExport = new ImportExport();
-        importExport.script();
-//
-//        SQLiteImportExport mYSQLImportExport = new SQLiteImportExport();
-//        mYSQLImportExport.script();
-//
-//        ManualGraph manualGraph = new ManualGraph();
-//        manualGraph.script();
-//
-//        ManipulateAttributes manipulateAttributes = new ManipulateAttributes();
-//        manipulateAttributes.script();
-//
-//        DynamicMetric longitudinalGraph = new DynamicMetric();
-//        longitudinalGraph.script();
-//
-//        ImportDynamic importDynamic = new ImportDynamic();
-//        importDynamic.script();
     }
 }
