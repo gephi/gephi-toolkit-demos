@@ -37,6 +37,7 @@ import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
+import java.nio.file.Files;
 
 /**
  * This demo focuses on Import and Export features, showing different IO
@@ -80,30 +81,30 @@ public class ImportExport {
 
         //Export full graph
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
-        try {
-            ec.exportFile(new File("io_gexf.gexf"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
-        }
+//        try {
+//            ec.exportFile(new File("io_gexf.gexf"));
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//            return;
+//        }
 
-        //Export only visible graph
-        GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");     //Get GEXF exporter
-        exporter.setExportVisible(true);  //Only exports the visible (filtered) graph
-        exporter.setWorkspace(workspace);
-        try {
-            ec.exportFile(new File("io_gexf.gexf"), exporter);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        //Export to Writer
-        Exporter exporterGraphML = ec.getExporter("graphml");     //Get GraphML exporter
-        exporterGraphML.setWorkspace(workspace);
-        StringWriter stringWriter = new StringWriter();
-        ec.exportWriter(stringWriter, (CharacterExporter) exporterGraphML);
-        //System.out.println(stringWriter.toString());   //Uncomment this line
+//        //Export only visible graph
+//        GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");     //Get GEXF exporter
+//        exporter.setExportVisible(true);  //Only exports the visible (filtered) graph
+//        exporter.setWorkspace(workspace);
+//        try {
+//            ec.exportFile(new File("io_gexf.gexf"), exporter);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//            return;
+//        }
+//
+//        //Export to Writer
+//        Exporter exporterGraphML = ec.getExporter("graphml");     //Get GraphML exporter
+//        exporterGraphML.setWorkspace(workspace);
+//        StringWriter stringWriter = new StringWriter();
+//        ec.exportWriter(stringWriter, (CharacterExporter) exporterGraphML);
+//        //System.out.println(stringWriter.toString());   //Uncomment this line
 
         //PDF Exporter config and export to Byte array
         PDFExporter pdfExporter = (PDFExporter) ec.getExporter("pdf");
@@ -112,5 +113,15 @@ public class ImportExport {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ec.exportStream(baos, pdfExporter);
         byte[] pdf = baos.toByteArray();
+        try{
+        File outputFile = new File("outputFile.pdf");
+        Files.write(outputFile.toPath(), pdf);
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+            return;
+        }
+//        outputStream.write(pdf);
+        
     }
 }

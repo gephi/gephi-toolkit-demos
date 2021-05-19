@@ -24,40 +24,40 @@ public class Main {
 
     public static void main(String[] args) {
 
-        HeadlessSimple headlessSimple = new HeadlessSimple();
-        headlessSimple.script();
-
-        WithAutoLayout autoLayout = new WithAutoLayout();
-        autoLayout.script();
-
-        ParallelWorkspace parallelWorkspace = new ParallelWorkspace();
-        parallelWorkspace.script();
-
-        PartitionGraph partitionGraph = new PartitionGraph();
-        partitionGraph.script();
-
-        RankingGraph rankingGraph = new RankingGraph();
-        rankingGraph.script();
-
-        Filtering filtering = new Filtering();
-        filtering.script();
+//        HeadlessSimple headlessSimple = new HeadlessSimple();
+//        headlessSimple.script();
+//
+//        WithAutoLayout autoLayout = new WithAutoLayout();
+//        autoLayout.script();
+//
+//        ParallelWorkspace parallelWorkspace = new ParallelWorkspace();
+//        parallelWorkspace.script();
+//
+//        PartitionGraph partitionGraph = new PartitionGraph();
+//        partitionGraph.script();
+//
+//        RankingGraph rankingGraph = new RankingGraph();
+//        rankingGraph.script();
+//
+//        Filtering filtering = new Filtering();
+//        filtering.script();
 
         ImportExport importExport = new ImportExport();
         importExport.script();
-
-        SQLiteImportExport mYSQLImportExport = new SQLiteImportExport();
-        mYSQLImportExport.script();
-
-        ManualGraph manualGraph = new ManualGraph();
-        manualGraph.script();
-
-        ManipulateAttributes manipulateAttributes = new ManipulateAttributes();
-        manipulateAttributes.script();
-
-        DynamicMetric longitudinalGraph = new DynamicMetric();
-        longitudinalGraph.script();
-
-        ImportDynamic importDynamic = new ImportDynamic();
-        importDynamic.script();
+//
+//        SQLiteImportExport mYSQLImportExport = new SQLiteImportExport();
+//        mYSQLImportExport.script();
+//
+//        ManualGraph manualGraph = new ManualGraph();
+//        manualGraph.script();
+//
+//        ManipulateAttributes manipulateAttributes = new ManipulateAttributes();
+//        manipulateAttributes.script();
+//
+//        DynamicMetric longitudinalGraph = new DynamicMetric();
+//        longitudinalGraph.script();
+//
+//        ImportDynamic importDynamic = new ImportDynamic();
+//        importDynamic.script();
     }
 }
