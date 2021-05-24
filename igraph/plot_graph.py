@@ -17,6 +17,12 @@ parser.add_argument('--contract', required=False, type=bool, help="If this flag 
 parser.add_argument("--color", required=False, type=bool, help="If this flag is provided, the script will try different"
                                                                "clustering, then, color the nodes according to "
                                                                "cluster.")
+parser.add_argument("--output_width", required=False, default=2000,
+                    type=int, help="Specify the output width in pixels.")
+parser.add_argument("--output_height", required=False, default=1000,
+                    type=int, help="Specify the output height in pixels.")
+parser.add_argument("--scale", required=False, type=bool, help="If this flag is provided, the script will scale"
+                                                               "the vertices by proportionally to their degree.")
 
 
 
@@ -24,8 +30,13 @@ def main():
     args = parser.parse_args()
     input_path = args.input_path
     output_path = args.output_path
+    # Modifications to the plot
     contract = args.contract
     color = args.color
+    scale = args.scale
+    # Set the output size
+    output_width, output_height = int(args.output_width), int(args.output_height)
+
 
     layout_algorithm = args.layout_algorithm
 
@@ -58,15 +69,20 @@ def main():
 
     deg = G.degree()
     layout = G.layout(layout_algorithm)
-    pixel_width, pixel_length = 2000, 1000
-    total_pixels = pixel_width * pixel_length
-    vertex_size = min(total_pixels / ((G.vcount() * 5) + 1), 10)
-    arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 10)
-    G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
+    visual_style = {}
+    total_pixels = output_width * output_height
+    vertex_size = min(total_pixels / ((G.vcount() * 6) + 1), 15)
+    arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 15)
+    visual_style["edge_arrow_size"] = arrow_size
 
-    igraph.plot(G, layout=layout,  edge_arrow_size=arrow_size,
-                bbox=(pixel_width, pixel_length),
-                target=output_path)
+    if scale:
+        G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
+    else:
+        visual_style["vertex_size"] = vertex_size
+
+    igraph.plot(G, layout=layout,
+                bbox=(output_width, output_height),
+                target=output_path, **visual_style)
 
 
 if __name__ == '__main__':
