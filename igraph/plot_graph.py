@@ -1,7 +1,7 @@
 import numpy as np
 
 import igraph
-
+import warnings
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -10,10 +10,13 @@ parser.add_argument("--output_path", required=True, type=str, help="Path to outp
 parser.add_argument("-algo", "--layout_algorithm", required=False, default="auto", type=str, help="The layout algorithm"
                                                                                                   "that iGraph should "
                                                                                                   "use.")
-parser.add_argument('-c', '--contract', required=False, type=bool, help="If this flag is provided the scrip will "
-                                                                        "attempt"
-                                                                        "to contract nodes into their clusters. "
-                                                                        "Recommended for larger graphs ~100k+.")
+parser.add_argument('--contract', required=False, type=bool, help="If this flag is provided, the script will "
+                                                                  "attempt"
+                                                                  "to contract nodes into their clusters. "
+                                                                  "Recommended for larger graphs ~100k+.")
+parser.add_argument("--color", required=False, type=bool, help="If this flag is provided, the script will try different"
+                                                               "clustering, then, color the nodes according to "
+                                                               "cluster.")
 
 
 def main():
@@ -21,14 +24,31 @@ def main():
     input_path = args.input_path
     output_path = args.output_path
     contract = args.contract
+    color = args.color
 
     layout_algorithm = args.layout_algorithm
 
     G = igraph.Graph.Load(input_path)
     if contract:
+        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         # TODO: Provide a more sophisticated contraction logic.
         G.to_undirected()
-        G = G.community_multilevel().cluster_graph()
+        # G = G.community_leiden().cluster_graph()
+        cluster = G.community_multilevel()
+        if cluster.modularity < .25:
+            cluster = G.community_leiden()
+        G = cluster.cluster_graph()
+
+    if color:
+        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
+        G.to_undirected()
+        # G = G.community_leiden().cluster_graph()
+        cluster = G.community_multilevel()
+        if cluster.modularity < .25:
+            cluster = G.community_leiden()
+
+        pal = igraph.drawing.colors.ClusterColoringPalette(len(cluster))
+        G.vs['color'] = pal.get_many(cluster.membership)
 
     deg = G.degree()
     layout = G.layout(layout_algorithm)
