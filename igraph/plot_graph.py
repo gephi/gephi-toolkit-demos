@@ -19,6 +19,7 @@ parser.add_argument("--color", required=False, type=bool, help="If this flag is 
                                                                "cluster.")
 
 
+
 def main():
     args = parser.parse_args()
     input_path = args.input_path
@@ -29,26 +30,31 @@ def main():
     layout_algorithm = args.layout_algorithm
 
     G = igraph.Graph.Load(input_path)
+    clustering_methods = [G.community_multilevel, G.community_leiden]
+
     if contract:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         # TODO: Provide a more sophisticated contraction logic.
         G.to_undirected()
-        # G = G.community_leiden().cluster_graph()
-        cluster = G.community_multilevel()
-        if cluster.modularity < .25:
-            cluster = G.community_leiden()
-        G = cluster.cluster_graph()
+        best_score, best_cluster = 0, None
+        for clustering in clustering_methods:
+            cluster = clustering()
+            if best_score > cluster.modularity:
+                best_cluster = cluster
+                best_score = clustering
+        G = best_cluster.cluster_graph()
 
     if color:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         G.to_undirected()
-        # G = G.community_leiden().cluster_graph()
-        cluster = G.community_multilevel()
-        if cluster.modularity < .25:
-            cluster = G.community_leiden()
-
-        pal = igraph.drawing.colors.ClusterColoringPalette(len(cluster))
-        G.vs['color'] = pal.get_many(cluster.membership)
+        best_score, best_cluster = 0, None
+        for clustering in clustering_methods:
+            cluster = clustering()
+            if best_score > cluster.modularity:
+                best_cluster = cluster
+                best_score = clustering
+        pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
+        G.vs['color'] = pal.get_many(best_cluster.membership)
 
     deg = G.degree()
     layout = G.layout(layout_algorithm)
@@ -56,9 +62,9 @@ def main():
     total_pixels = pixel_width * pixel_length
     vertex_size = min(total_pixels / ((G.vcount() * 5) + 1), 10)
     arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 10)
-    vertex_size = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
+    G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
 
-    igraph.plot(G, layout=layout, vertex_size=vertex_size, edge_arrow_size=arrow_size,
+    igraph.plot(G, layout=layout,  edge_arrow_size=arrow_size,
                 bbox=(pixel_width, pixel_length),
                 target=output_path)
 
