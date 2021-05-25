@@ -1,5 +1,5 @@
 import numpy as np
-
+import traceback as tb
 import igraph
 import warnings
 import argparse
@@ -25,7 +25,6 @@ parser.add_argument("--scale", required=False, type=bool, help="If this flag is 
                                                                "the vertices by proportionally to their degree.")
 
 
-
 def main():
     args = parser.parse_args()
     input_path = args.input_path
@@ -36,17 +35,25 @@ def main():
     scale = args.scale
     # Set the output size
     output_width, output_height = int(args.output_width), int(args.output_height)
-
-
+    # Layout algorithm
     layout_algorithm = args.layout_algorithm
 
-    G = igraph.Graph.Load(input_path)
+    # Attempt to load the graph
+    try:
+        G = igraph.Graph.Load(input_path)
+    except Exception as e:
+        tb.print_exc()
+        print(e)
+        print("Failed to load the graph from: " + input_path)
+
+    # The list of clustering methods to attempt.
     clustering_methods = [G.community_multilevel, G.community_leiden]
 
     if contract:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         # TODO: Provide a more sophisticated contraction logic.
         G.to_undirected()
+        # Choose the clustering with the best modularity score
         best_score, best_cluster = 0, None
         for clustering in clustering_methods:
             cluster = clustering()
@@ -58,6 +65,7 @@ def main():
     if color:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         G.to_undirected()
+        # Choose the clustering with the best modularity score
         best_score, best_cluster = 0, None
         for clustering in clustering_methods:
             cluster = clustering()
@@ -70,16 +78,21 @@ def main():
     deg = G.degree()
     layout = G.layout(layout_algorithm)
     visual_style = {}
+
+    # Compute the total number of pixels in the output plot
     total_pixels = output_width * output_height
+    # Scale the vertex and arrow size based on the number of output pixels
     vertex_size = min(total_pixels / ((G.vcount() * 6) + 1), 15)
     arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 15)
     visual_style["edge_arrow_size"] = arrow_size
 
+    # Scale based on node degree if requested.
     if scale:
         G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
     else:
         visual_style["vertex_size"] = vertex_size
 
+    # Plot the graph with the requested settings and layout.
     igraph.plot(G, layout=layout,
                 bbox=(output_width, output_height),
                 target=output_path, **visual_style)
