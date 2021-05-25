@@ -23,6 +23,8 @@ parser.add_argument("--output_height", required=False, default=1000,
                     type=int, help="Specify the output height in pixels.")
 parser.add_argument("--scale", required=False, type=bool, help="If this flag is provided, the script will scale"
                                                                "the vertices by proportionally to their degree.")
+parser.add_argument("--drop_isolates", required=False, type=bool, help="If this flag is provided, the script will drop"
+                                                                       "isolates from the graph plot.")
 
 
 def main():
@@ -33,6 +35,7 @@ def main():
     contract = args.contract
     color = args.color
     scale = args.scale
+    drop_isolates = args.drop_isolates
     # Set the output size
     output_width, output_height = int(args.output_width), int(args.output_height)
     # Layout algorithm
@@ -78,6 +81,9 @@ def main():
     deg = G.degree()
     layout = G.layout(layout_algorithm)
     visual_style = {}
+
+    if drop_isolates:
+        G.delete_vertices(G.vs.select(_degree = 0))
 
     # Compute the total number of pixels in the output plot
     total_pixels = output_width * output_height
