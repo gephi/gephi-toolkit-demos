@@ -50,31 +50,35 @@ def main():
         print("Failed to load the graph from: " + input_path)
 
     # The list of clustering methods to attempt.
-    clustering_methods = [G.community_multilevel, G.community_leiden]
+    # clustering_methods = [G.community_multilevel]
 
     if contract:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         # TODO: Provide a more sophisticated contraction logic.
+        # TODO: Scale community vector size by their size
         G.to_undirected()
         # Choose the clustering with the best modularity score
-        best_score, best_cluster = 0, None
-        for clustering in clustering_methods:
-            cluster = clustering()
-            if best_score > cluster.modularity:
-                best_cluster = cluster
-                best_score = clustering
+        # best_score, best_cluster = 0, None
+        # for clustering in clustering_methods:
+        #     cluster = clustering()
+        #     if best_score > cluster.modularity:
+        #         best_cluster = cluster
+        #         best_score = clustering
+
+        best_cluster = G.community_multilevel()
         G = best_cluster.cluster_graph()
 
     if color:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         G.to_undirected()
         # Choose the clustering with the best modularity score
-        best_score, best_cluster = 0, None
-        for clustering in clustering_methods:
-            cluster = clustering()
-            if best_score > cluster.modularity:
-                best_cluster = cluster
-                best_score = clustering
+        # best_score, best_cluster = 0, None
+        # for clustering in clustering_methods:
+        #     cluster = clustering()
+        #     if best_score > cluster.modularity:
+        #         best_cluster = cluster
+        #         best_score = clustering
+        best_cluster = G.community_multilevel()
         pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
         G.vs['color'] = pal.get_many(best_cluster.membership)
 
@@ -83,13 +87,13 @@ def main():
     visual_style = {}
 
     if drop_isolates:
-        G.delete_vertices(G.vs.select(_degree = 0))
+        G.delete_vertices(G.vs.select(_degree=0))
 
     # Compute the total number of pixels in the output plot
     total_pixels = output_width * output_height
     # Scale the vertex and arrow size based on the number of output pixels
     vertex_size = min(total_pixels / ((G.vcount() * 6) + 1), 15)
-    arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 15)
+    arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 10)
     visual_style["edge_arrow_size"] = arrow_size
 
     # Scale based on node degree if requested.
