@@ -48,6 +48,12 @@ def main():
         tb.print_exc()
         print(e)
         print("Failed to load the graph from: " + input_path)
+    
+    # Drop isolates if requested.
+    if drop_isolates:
+        G.delete_vertices(G.vs.select(_degree = 0))
+
+
 
     # The list of clustering methods to attempt.
     # clustering_methods = [G.community_multilevel]
@@ -86,15 +92,14 @@ def main():
     layout = G.layout(layout_algorithm)
     visual_style = {}
 
-    if drop_isolates:
-        G.delete_vertices(G.vs.select(_degree=0))
-
-    # Compute the total number of pixels in the output plot
+   # Compute the total number of pixels in the output plot
     total_pixels = output_width * output_height
     # Scale the vertex and arrow size based on the number of output pixels
     vertex_size = min(total_pixels / ((G.vcount() * 6) + 1), 15)
-    arrow_size = min(total_pixels / ((G.ecount() * 45) + 1), 10)
+    arrow_size =  .5
+    arrow_width = .5
     visual_style["edge_arrow_size"] = arrow_size
+    visual_style["edge_arrow_width"] = arrow_width
 
     # Scale based on node degree if requested.
     if scale:
