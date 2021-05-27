@@ -77,13 +77,6 @@ def main():
     if color:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
         G.to_undirected()
-        # Choose the clustering with the best modularity score
-        # best_score, best_cluster = 0, None
-        # for clustering in clustering_methods:
-        #     cluster = clustering()
-        #     if best_score > cluster.modularity:
-        #         best_cluster = cluster
-        #         best_score = clustering
         best_cluster = G.community_multilevel()
         pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
         G.vs['color'] = pal.get_many(best_cluster.membership)
