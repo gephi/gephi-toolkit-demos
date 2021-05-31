@@ -1,4 +1,45 @@
-Layout algorithm options:
+### Dependencies 
+Please use conda on the requirements.txt file.
+
+### Required Arguments
+
+* Input path: The path an input file this should be one accepted by the following readers:
+
+    * Read_DL - igraph._igraph.GraphBase.Read_DL
+    * Read_Edgelist - igraph._igraph.GraphBase.Read_Edgelist
+    * Read_GML - igraph._igraph.GraphBase.Read_GML
+    * Read_GraphDB - igraph._igraph.GraphBase.Read_GraphDB
+    * Read_GraphML - igraph._igraph.GraphBase.Read_GraphML
+    * Read_GraphMLz - igraph.Graph.Read_GraphMLz
+    * Read_Lgl - igraph._igraph.GraphBase.Read_Lgl
+    * Read_Ncol - igraph._igraph.GraphBase.Read_Ncol
+    * Read_Pajek - igraph._igraph.GraphBase.Read_Pajek
+    * Read_Pickle - igraph.Graph.Read_Pickle
+    * Read_Picklez - igraph.Graph.Read_Picklez
+    * Read_Picklez 0 - igraph.Graph.Read_Picklez 0
+    
+* Output path: The path to the output plot. The file suffix will determine the type automatically. PDF is the recommended ending.
+
+
+### Optional Arguments
+
+* algo - This sets the layout algorithm. Selection should come from the next section.
+
+* output width - Sets the output width in pixels.
+
+* output height - Sets the output height in pixels.
+
+#### Boolean Switches
+
+* contract - This will contract nodes into their communities as determined by the multilevel communities algorithm (Louvain-based).
+
+* color - This will color nodes according to their communities as determined by the multilevel communities algorithm (Louvain-based). This will be run after nodes are contracted if contract is set.
+
+* scale - This will scale nodes according to their degree.
+
+* drop_isolates - This removes isolates. It will be run prior to any clustering.
+
+### Layout algorithm options:
 
 layout_circle
 	

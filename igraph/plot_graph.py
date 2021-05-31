@@ -1,3 +1,7 @@
+__author__ = "Henry Carscadden"
+__contact__ = "hlc5v@virginia.edu"
+
+
 import numpy as np
 import traceback as tb
 import igraph
@@ -7,6 +11,8 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_path", required=True, type=str, help="Path to input file.")
 parser.add_argument("--output_path", required=True, type=str, help="Path to output file.")
+
+# All of the below are optional CLAs
 parser.add_argument("-algo", "--layout_algorithm", required=False, default="auto", type=str, help="The layout algorithm"
                                                                                                   "that iGraph should "
                                                                                                   "use.")
@@ -29,6 +35,7 @@ parser.add_argument("--drop_isolates", required=False, type=bool, help="If this 
 
 def main():
     args = parser.parse_args()
+    # Path Arguments
     input_path = args.input_path
     output_path = args.output_path
     # Modifications to the plot
@@ -48,28 +55,21 @@ def main():
         tb.print_exc()
         print(e)
         print("Failed to load the graph from: " + input_path)
-    
+
     # Drop isolates if requested.
     if drop_isolates:
-        G.delete_vertices(G.vs.select(_degree = 0))
-
-
+        G.delete_vertices(G.vs.select(_degree=0))
 
     # The list of clustering methods to attempt.
     # clustering_methods = [G.community_multilevel]
 
     if contract:
         warnings.warn(UserWarning("Contract will convert the graph to undirected."))
+        # TODO: These are coming the next version. Do not worry Lucas.
         # TODO: Provide a more sophisticated contraction logic.
         # TODO: Scale community vector size by their size
         G.to_undirected()
-        # Choose the clustering with the best modularity score
-        # best_score, best_cluster = 0, None
-        # for clustering in clustering_methods:
-        #     cluster = clustering()
-        #     if best_score > cluster.modularity:
-        #         best_cluster = cluster
-        #         best_score = clustering
+
 
         best_cluster = G.community_multilevel()
         G = best_cluster.cluster_graph()
@@ -85,11 +85,11 @@ def main():
     layout = G.layout(layout_algorithm)
     visual_style = {}
 
-   # Compute the total number of pixels in the output plot
+    # Compute the total number of pixels in the output plot
     total_pixels = output_width * output_height
     # Scale the vertex and arrow size based on the number of output pixels
     vertex_size = min(total_pixels / ((G.vcount() * 6) + 1), 15)
-    arrow_size =  .5
+    arrow_size = .5
     arrow_width = .5
     visual_style["edge_arrow_size"] = arrow_size
     visual_style["edge_arrow_width"] = arrow_width
