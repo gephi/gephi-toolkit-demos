@@ -95,7 +95,7 @@ def main():
     # Scale based on node degree if requested.
     if scale:
         if scale != "degree":
-            if scale == "comm_deg":
+            if scale == "comm_degree":
                 sizes = np.fromiter((sum([old_G.vs[node].degree() for node in best_cluster[comm.index]]) for comm in G.vs),
                                     dtype=float)
                 sizes = ((sizes - np.mean(sizes)) / (1 + (np.std(sizes) * 2)) * vertex_size) + vertex_size
