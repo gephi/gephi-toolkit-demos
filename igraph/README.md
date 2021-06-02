@@ -29,13 +29,19 @@ Please use conda on the requirements.txt file.
 
 * output height - Sets the output height in pixels.
 
+* scale - A string that allows you to choose how to scale the nodes if at all.
+  * degree - Scales nodes by their degree in the graph. If nodes are contracted, the degree
+  of the nodes in the contracted graph is used.
+  * Community only methods
+    * comm_degree - Scales nodes in a contracted graph by the sum of the degree of the node's members in the original graph. 
+    If not clustering is performed, this is an error.
+    * comm_size - This is for contracted graphs only. This scales nodes by the size of their community.
+
 #### Boolean Switches
 
 * contract - This will contract nodes into their communities as determined by the multilevel communities algorithm (Louvain-based).
 
 * color - This will color nodes according to their communities as determined by the multilevel communities algorithm (Louvain-based). This will be run after nodes are contracted if contract is set.
-
-* scale - This will scale nodes according to their degree.
 
 * drop_isolates - This removes isolates. It will be run prior to any clustering.
 
