@@ -37,11 +37,18 @@ Please use conda on the requirements.txt file.
     If not clustering is performed, this is an error.
     * comm_size - This is for contracted graphs only. This scales nodes by the size of their community.
 
+* color - This CLA may have three types of values. If the community contraction is applied with comm_coloring,
+the coloring will be applied based on the community selected for the contraction. If there are more nodes than available
+  colors, comm_coloring will not color each community uniquely.
+1. comm_coloring - This colors the nodes by their community.  
+2. An igraph supported color. One of: "red", "blue",
+   "black", "brown", "green", "orange", "yellow", 
+   "magenta", "lime", "indigo", "cyan".
+3. A custom coloring scheme. - Not available yet.
+
 #### Boolean Switches
 
 * contract - This will contract nodes into their communities as determined by the multilevel communities algorithm (Louvain-based).
-
-* color - This will color nodes according to their communities as determined by the multilevel communities algorithm (Louvain-based). This will be run after nodes are contracted if contract is set.
 
 * drop_isolates - This removes isolates. It will be run prior to any clustering.
 
