@@ -1,7 +1,6 @@
 __author__ = "Henry Carscadden"
 __contact__ = "hlc5v@virginia.edu"
 
-
 import numpy as np
 import traceback as tb
 import igraph
@@ -20,15 +19,19 @@ parser.add_argument('--contract', required=False, type=bool, help="If this flag 
                                                                   "attempt"
                                                                   "to contract nodes into their clusters. "
                                                                   "Recommended for larger graphs ~100k+.")
-parser.add_argument("--color", required=False, type=bool, help="If this flag is provided, the script will try different"
-                                                               "clustering, then, color the nodes according to "
-                                                               "cluster.")
+parser.add_argument("--color", required=False, type=str, help="This CLA may have three types of values. 1."
+                                                              "comm_coloring - This colors the nodes by their "
+                                                              "community. "
+                                                              '2. An igraph supported color. One of: "red", "blue", '
+                                                              '"black", "brown", "green", "orange", "yellow", '
+                                                              '"magenta", "lime", "indigo", "cyan"' 
+                                                              "3. A custom coloring scheme. - Not available yet.")
 parser.add_argument("--output_width", required=False, default=2000,
                     type=int, help="Specify the output width in pixels.")
 parser.add_argument("--output_height", required=False, default=1000,
                     type=int, help="Specify the output height in pixels.")
-parser.add_argument("--scale", required=False, type=bool, help="If this flag is provided, the script will scale"
-                                                               "the vertices by proportionally to their degree.")
+parser.add_argument("--scale", required=False, type=str, help="If this flag is provided, the script will scale"
+                                                              "the vertices by proportionally to their degree.")
 parser.add_argument("--drop_isolates", required=False, type=bool, help="If this flag is provided, the script will drop"
                                                                        "isolates from the graph plot.")
 
@@ -48,6 +51,8 @@ def main():
     # Layout algorithm
     layout_algorithm = args.layout_algorithm
 
+    colors = ["red", "blue", "black", "brown", "green", "orange", "yellow", "magenta", "lime", "indigo", "cyan"]
+
     # Attempt to load the graph
     try:
         G = igraph.Graph.Load(input_path)
@@ -55,34 +60,8 @@ def main():
         tb.print_exc()
         print(e)
         print("Failed to load the graph from: " + input_path)
+        exit(1)
 
-    # Drop isolates if requested.
-    if drop_isolates:
-        G.delete_vertices(G.vs.select(_degree=0))
-
-    # The list of clustering methods to attempt.
-    # clustering_methods = [G.community_multilevel]
-
-    if contract:
-        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
-        # TODO: These are coming the next version. Do not worry Lucas.
-        # TODO: Provide a more sophisticated contraction logic.
-        # TODO: Scale community vector size by their size
-        G.to_undirected()
-
-
-        best_cluster = G.community_multilevel()
-        G = best_cluster.cluster_graph()
-
-    if color:
-        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
-        G.to_undirected()
-        best_cluster = G.community_multilevel()
-        pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
-        G.vs['color'] = pal.get_many(best_cluster.membership)
-
-    deg = G.degree()
-    layout = G.layout(layout_algorithm)
     visual_style = {}
 
     # Compute the total number of pixels in the output plot
@@ -94,9 +73,57 @@ def main():
     visual_style["edge_arrow_size"] = arrow_size
     visual_style["edge_arrow_width"] = arrow_width
 
+    # Drop isolates if requested.
+    if drop_isolates:
+        G.delete_vertices(G.vs.select(_degree=0))
+
+    if contract:
+        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
+        # TODO: These are coming the next version. Do not worry Lucas.
+        # TODO: Provide a more sophisticated contraction logic.
+        G.to_undirected()
+
+        best_cluster = G.community_multilevel()
+
+        if scale != "degree":
+            old_G = G.copy()
+
+        G = best_cluster.cluster_graph()
+
+        if color == "comm_coloring":
+            G.vs['color'] = np.random.choice(colors, size=(G.vcount(),), replace=True)
+
+    if color == "comm_coloring" and not contract:
+        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
+        G.to_undirected()
+        best_cluster = G.community_multilevel()
+        pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
+        G.vs['color'] = pal.get_many(best_cluster.membership)
+    elif color in colors:
+        G.vs["color"] = color
+
+    deg = G.degree()
+    layout = G.layout(layout_algorithm)
+
     # Scale based on node degree if requested.
     if scale:
-        G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
+        if scale != "degree":
+            if scale == "comm_degree":
+                # TODO: This should be only using inter-cluster edges in degree.
+                sizes = np.fromiter(
+                    (sum([sum(1 for neighbor in old_G.vs[node].neighbors() if neighbor not in best_cluster[comm.index])
+                          for node in best_cluster[comm.index]]) for comm in
+                     G.vs),
+                    dtype=float)
+                sizes = ((sizes - np.mean(sizes)) / (1 + (np.std(sizes) * 2)) * vertex_size) + vertex_size
+                G.vs["size"] = sizes
+            elif scale == "comm_size":
+                sizes = best_cluster.sizes()
+                G.vs["size"] = (((sizes - np.mean(sizes)) / ((2 * np.std(sizes)) + 1)) * vertex_size) + vertex_size
+            else:
+                raise Exception(scale + " is not a valid scaling style.")
+        else:
+            G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
     else:
         visual_style["vertex_size"] = vertex_size
 
