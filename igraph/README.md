@@ -25,6 +25,12 @@ Please use conda on the requirements.txt file.
 
 * algo - This sets the layout algorithm. Selection should come from the next section.
 
+* cluster - This takes a list of graph clustering algorithm names. They should be selected from: components the connected components, cohesive_blocks, community_edge_betweenness,
+                        community_fastgreedy, community_infomap, community_label_propagation, community_leading_eigenvector, community_leading_eigenvector_naive, community_leiden,
+                        community_multilevel (a version of Louvain), community_optimal_modularity (exact solution, < 100 vertices), community_spinglass, community_walktrap. If none is selected
+                        community_multilevel is used. The best is selected by modularity score.
+
+
 * output width - Sets the output width in pixels.
 
 * output height - Sets the output height in pixels.

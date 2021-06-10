@@ -24,8 +24,32 @@ parser.add_argument("--color", required=False, type=str, help="This CLA may have
                                                               "community. "
                                                               '2. An igraph supported color. One of: "red", "blue", '
                                                               '"black", "brown", "green", "orange", "yellow", '
-                                                              '"magenta", "lime", "indigo", "cyan"' 
+                                                              '"magenta", "lime", "indigo", "cyan"'
                                                               "3. A custom coloring scheme. - Not available yet.")
+parser.add_argument("--cluster", required=False,
+                    type=str, nargs="*", default=["community_multilevel"], help="This takes a list of graph "
+                                                                                "clustering algorithm names. "
+                                                                                "They should be selected from: "
+                                                                                "components the connected "
+                                                                                "components, "
+                                                                                "cohesive_blocks, "
+                                                                                "community_edge_betweenness, "
+                                                                                "community_fastgreedy, "
+                                                                                "community_infomap, "
+                                                                                "community_label_propagation, "
+                                                                                "community_leading_eigenvector, "
+                                                                                "community_leading_eigenvector_naive, "
+                                                                                "community_leiden, "
+                                                                                "community_multilevel "
+                                                                                "(a version of Louvain), "
+                                                                                "community_optimal_modularity "
+                                                                                "(exact solution, < 100 "
+                                                                                "vertices), "
+                                                                                "community_spinglass, "
+                                                                                "community_walktrap. "
+                                                                                "If none is selected "
+                                                                                " community_multilevel is used."
+                    )
 parser.add_argument("--output_width", required=False, default=2000,
                     type=int, help="Specify the output width in pixels.")
 parser.add_argument("--output_height", required=False, default=1000,
@@ -34,6 +58,45 @@ parser.add_argument("--scale", required=False, type=str, help="If this flag is p
                                                               "the vertices by proportionally to their degree.")
 parser.add_argument("--drop_isolates", required=False, type=bool, help="If this flag is provided, the script will drop"
                                                                        "isolates from the graph plot.")
+
+
+def cluster(G, algo_str):
+    """
+    This is a helper function to compute clusters using user-selected algorithms.
+    :param G: The input graph.
+    :param algo_str: A string saying what clustering algorithm to use.
+    :return: A clustering object.
+    """
+
+    if algo_str == "components":
+        return G.components()
+    elif algo_str == "cohesive_blocks":
+        return G.cohesive_blocks()
+    elif algo_str == "community_edge_betweenness":
+        return G.community_edge_betweenness()
+    elif algo_str == "community_fastgreedy":
+        return G.community_fastgreedy()
+    elif algo_str == "community_infomap":
+        return G.community_infomap()
+    elif algo_str == "community_label_propagation":
+        return G.community_label_propagation()
+    elif algo_str == "community_leading_eigenvector":
+        return G.community_leading_eigenvector()
+    elif algo_str == "community_leading_eigenvector_naive":
+        return G.community_leading_eigenvector_naive()
+    elif algo_str == "community_leiden":
+        return G.community_leiden()
+    elif algo_str == "community_multilevel":
+        return G.community_multilevel()
+    elif algo_str == "community_optimal_modularity":
+        return G.community_optimal_modularity()
+    elif algo_str == "community_spinglass":
+        return G.community_spinglass()
+    elif algo_str == "community_walktrap":
+        return G.community_walktrap()
+    else:
+        print(algo_str)
+        raise ValueError("Invalid clustering algorithm name.")
 
 
 def main():
@@ -50,6 +113,8 @@ def main():
     output_width, output_height = int(args.output_width), int(args.output_height)
     # Layout algorithm
     layout_algorithm = args.layout_algorithm
+    # The clustering algorithm to try.
+    clusterings = args.cluster
 
     colors = ["red", "blue", "black", "brown", "green", "orange", "yellow", "magenta", "lime", "indigo", "cyan"]
 
@@ -77,13 +142,27 @@ def main():
     if drop_isolates:
         G.delete_vertices(G.vs.select(_degree=0))
 
-    if contract:
-        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
-        # TODO: These are coming the next version. Do not worry Lucas.
-        # TODO: Provide a more sophisticated contraction logic.
+    if color or contract:
         G.to_undirected()
+        warnings.warn(UserWarning("Clustering will convert the graph to undirected."))
 
-        best_cluster = G.community_multilevel()
+        best_cluster = None
+        best_score = 0
+        for clustering in clusterings:
+            if best_cluster is None:
+                best_cluster = cluster(G, clustering)
+                best_score = float(best_cluster.modularity)
+            else:
+                curr_cluster = cluster(G, clustering)
+                curr_score = float(curr_cluster.modularity)
+                if best_score < float(curr_score):
+                    print(best_score < curr_score)
+                    print(clustering)
+                    print(curr_cluster.summary())
+                    best_cluster = curr_cluster
+                    best_score = curr_score
+
+    if contract:
 
         if scale != "degree":
             old_G = G.copy()
@@ -94,9 +173,6 @@ def main():
             G.vs['color'] = np.random.choice(colors, size=(G.vcount(),), replace=True)
 
     if color == "comm_coloring" and not contract:
-        warnings.warn(UserWarning("Contract will convert the graph to undirected."))
-        G.to_undirected()
-        best_cluster = G.community_multilevel()
         pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
         G.vs['color'] = pal.get_many(best_cluster.membership)
     elif color in colors:
