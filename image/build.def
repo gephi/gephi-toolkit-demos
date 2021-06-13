@@ -1,0 +1,46 @@
+Bootstrap: docker
+From: ubuntu:21.04
+
+%setup
+mkdir -p $SINGULARITY_ROOTFS/input
+mkdir -p $SINGULARITY_ROOTFS/src
+
+%files
+generated_config.json /sciduct/config.json
+../igraph /
+
+%post
+apt update
+export DEBIAN_FRONTEND=noninteractive
+apt-get install dialog
+apt install -y python3-pip
+apt install -y jq
+apt install -y python3-cairo
+apt install -y pkg-config
+ln -s /usr/bin/python3 /usr/bin/python
+
+pip install python-igraph
+pip install numpy
+#pip install pycairo
+
+%apprun sciduct
+	cat /sciduct/config.json
+
+%apprun generate_graph_visualization
+	python3 /igraph/plot_graph.py $@
+
+%apprun generate_graph_visualization_sciduct 
+        ALGO=`cat /job/job.json | jq -r .input.layout_algorithm`
+	CONTRACT=`cat /job/job.json | jq -r .input.contract`
+	CLUSTER=`cat /job/job.json | jq -r .input.cluster`
+	COLOR=`cat /job/job.json | jq -r .input.color`
+	WIDTH=`cat /job/job.json | jq -r .input.output_width`
+	HEIGHT=`cat /job/job.json | jq -r .input.output_height`
+	SCALE=`cat /job/job.json | jq -r .input.scale`
+	DROP_ISOLATES=`cat /job/job.json | jq -r .input.drop_isolates`
+	OUTPUT_TYPE=`cat /job/job.json | jq -r .input.output_type`
+
+	cat /input/graph | grep -v "^#" > /input/graph.edgelist
+        # Call the plotter
+        /scif/apps/generate_graph_visualization/scif/runscript --input_path /input/graph.edgelist --output_path /output/output.$OUTPUT_TYPE --layout_algorithm $ALGO --contract $CONTRACT --cluster $CLUSTER  --color $COLOR --output_width $WIDTH --output_height $HEIGHT --scale $SCALE --drop_isolates $DROP_ISOLATES && mv /output/output.$OUTPUT_TYPE /output/output.plot
+

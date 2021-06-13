@@ -1,0 +1,135 @@
+{
+  "apps": [
+    {
+      "app": "generate_graph_visualization_sciduct",
+      "name": "generate_graph_visualization",
+      "binds": {
+        "input": "input",
+        "output": "output"
+      },
+      "description": "Generates Graph Visualization of nodes",
+      "input_files": [
+        {
+          "name": "graph",
+          "required": true,
+          "types": [
+            "PUNGraph",
+            "PNGraph",
+            "PNEANet"
+          ]
+        }
+      ],
+      "input_schema": {
+        "properties": {
+          "layout_algorithm": {
+            "type": "string",
+            "description": "The layout algorithm to use",
+            "enum": [
+              "auto"
+            ],
+            "default": "auto"
+          },
+          "contract": {
+            "type": "boolean",
+            "description": "If this flag is enabled, the script will 'attempt' to contract nodes into their clusters.",
+            "default": false
+          },
+          "cluster": {
+            "type": "string",
+            "description": "The type of clustering to be performed",
+            "enum": [
+              "components",
+              "cohesive_blocks",
+              "community_edge_betweenness",
+              "community_fastgreedy",
+              "community_infomap",
+              "community_label_propagation",
+              "community_leading_eigenvector",
+              "community_leading_eigenvector_naive",
+              "community_leiden",
+              "community_multilevel",
+              "community_optimal_modularity",
+              "community_spinglass",
+              "community_walktrap"
+            ],
+            "default": "community_multilevel"
+          },
+          "color": {
+            "type": "string",
+            "description": "The color palette to use",
+            "enum": [
+              "red",
+              "blue",
+              "black",
+              "brown",
+              "green",
+              "orange",
+              "yellow",
+              "magenta",
+              "lime",
+              "indigo",
+              "cyan"
+            ]
+          },
+          "output_width": {
+            "type": "number",
+            "description": "Output width in pixels",
+            "default": 2000
+          },
+          "output_height": {
+            "type": "number",
+            "description": "Output Height in pixels",
+            "default": 1000
+          },
+          "output_type": {
+            "type": "string",
+            "description": "The format of the output",
+            "enum": [
+              "pdf",
+              "png",
+              "svg",
+              "ps"
+            ],
+            "default": "pdf"
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale the verticies proportionally by their degree",
+            "enum": [
+              "degree",
+              "comm_degree"
+            ],
+            "default": "degree"
+          },
+          "drop_isolates": {
+            "type": "boolean",
+            "description": "Drop isolates from the graph plot",
+            "default": false
+          }
+        }
+      },
+      "resource_requirements": {
+        "cores": 1,
+        "nodes": 1,
+        "timelimit": 60
+      },
+      "output_files": {
+        "file": "output.plot",
+        "associateJobMeta": true,
+        "isContainer": false,
+        "type": {
+          "$ref": "job_instance#/input/output_type"
+        }
+      }
+    }
+  ],
+  "authors": [
+    "Henry Carscadden",
+    "Chris Kuhlman",
+    "Dustin Machi"
+  ],
+  "description": "A container that provides graph visualizations",
+  "license": "BSD License",
+  "version": "1.0.0-3",
+  "build_date": "2021-06-13T20:03:48.818Z"
+}
