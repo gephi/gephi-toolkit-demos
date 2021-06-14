@@ -37,7 +37,7 @@ Please use conda on the requirements.txt file.
 		* pdf
 		* png
 		* svg
-		* ps 
+		* ps or eps
 
 
 ### Optional Arguments
