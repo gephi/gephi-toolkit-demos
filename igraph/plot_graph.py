@@ -201,7 +201,6 @@ def main():
     if scale:
         if scale != "degree":
             if scale == "comm_degree":
-                # TODO: This should be only using inter-cluster edges in degree.
                 sizes = np.fromiter(
                     (sum([sum(1 for neighbor in old_G.vs[node].neighbors() if neighbor not in best_cluster[comm.index])
                           for node in best_cluster[comm.index]]) for comm in
