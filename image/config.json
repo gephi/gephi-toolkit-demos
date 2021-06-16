@@ -35,7 +35,7 @@
                     "cluster": {
                         "type": "string",
                         "description": "The type of clustering to be performed",
-                        "enum": ["components","cohesive_blocks","community_edge_betweenness","community_fastgreedy","community_infomap","community_label_propagation","community_leading_eigenvector","community_leading_eigenvector_naive","community_leiden","community_multilevel","community_optimal_modularity","community_spinglass","community_walktrap"],
+                        "enum": ["components","cohesive_blocks","community_fastgreedy","community_infomap","community_label_propagation","community_leiden","community_multilevel","community_optimal_modularity","community_spinglass","community_walktrap"],
                         "default": "community_multilevel"
                     },
                     "color": {
@@ -70,7 +70,8 @@
                         "description": "Drop isolates from the graph plot",
                         "default": false
                     }
-                }
+                },
+		"required": ["layout_algorithm","contract","cluster","color","output_width","output_height","output_type","scale","drop_isolates"]
             },
             "resource_requirements": {
                 "cores": 1,
@@ -92,5 +93,5 @@
     ],
     "description": "A container that provides graph visualizations",
     "license": "BSD License",
-    "version": "1.0.0-6"
+    "version": "1.0.0-8"
 }
