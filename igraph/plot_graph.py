@@ -99,11 +99,27 @@ def cluster(G, algo_str):
         raise ValueError("Invalid clustering algorithm name.")
 
 
+output_formats = ["pdf", "png", "svg", "ps", "eps"]
+input_formats = ["lgl", "adjacency", "dimacs", "dl", "edgelist", "edges", "edge", "graphviz", "dot", "gml", "graphml",
+                 "graphmlz", "leda", "ncol", "pajek", "net", "pickle"]
+
+
 def main():
     args = parser.parse_args()
     # Path Arguments
     input_path = args.input_path
+    # Check if the format is valid.
+    if input_path.split(".")[-1].lower() not in input_formats:
+        print("The input file extension is " + input_path.split(".")[-1].lower() + " is not a supported input format.")
+        raise TypeError("The input file extension should be one of: " + str(input_formats))
+
+    # Check if the format is valid.
     output_path = args.output_path
+    if output_path.split(".")[-1].lower() not in output_formats:
+        print(
+            "The input file extension is " + output_path.split(".")[-1].lower() + " is not a supported output format.")
+        raise TypeError("The output file extension should be one of: " + str(output_formats))
+
     # Modifications to the plot
     contract = args.contract
     color = args.color
@@ -185,7 +201,6 @@ def main():
     if scale:
         if scale != "degree":
             if scale == "comm_degree":
-                # TODO: This should be only using inter-cluster edges in degree.
                 sizes = np.fromiter(
                     (sum([sum(1 for neighbor in old_G.vs[node].neighbors() if neighbor not in best_cluster[comm.index])
                           for node in best_cluster[comm.index]]) for comm in
