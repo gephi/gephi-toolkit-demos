@@ -158,7 +158,7 @@ def main():
     if drop_isolates:
         G.delete_vertices(G.vs.select(_degree=0))
 
-    if color or contract:
+    if color == "comm_coloring" or contract:
         G.to_undirected()
         warnings.warn(UserWarning("Clustering will convert the graph to undirected."))
 
