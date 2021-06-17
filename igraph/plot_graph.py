@@ -200,7 +200,12 @@ def main():
     # Scale based on node degree if requested.
     if scale:
         if scale != "degree":
+            # If we are not contracting into communities and these options are set, this is a problem.
+            if (scale == "comm_degree" or scale == "comm_size") and not contract:
+                raise ValueError("If scaling by community traits is requested (i.e. comm_degree or comm_size), then,"
+                                 "contract must also be true.")
             if scale == "comm_degree":
+                # Compute inter-community degree
                 sizes = np.fromiter(
                     (sum([sum(1 for neighbor in old_G.vs[node].neighbors() if neighbor not in best_cluster[comm.index])
                           for node in best_cluster[comm.index]]) for comm in
