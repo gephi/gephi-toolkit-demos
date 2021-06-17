@@ -40,7 +40,52 @@ pip install numpy
 	DROP_ISOLATES=`cat /job/job.json | jq -r .input.drop_isolates`
 	OUTPUT_TYPE=`cat /job/job.json | jq -r .input.output_type`
 
+	case $ALGO in
+		"Circular")
+			LAYOUT_ALGO="circle"
+			;;
+		"Distributed Recursive")
+			LAYOUT_ALGO="drl"
+			;;
+		"Fruchterman-Reingold Force-directed")
+			LAYOUT_ALGO="fr"
+			;;
+		"Fruchterman-Reingold Force-directed 3D")
+			LAYOUT_ALGO="fr3d"
+			;;
+		"Fruchterman-Reingold Forced-directed Large Graphs")
+			LAYOUT_ALGO="grid_fr"
+			;;
+		"Kamada-Kawai Force-directed")
+			LAYOUT_ALGO="kk"
+			;;
+		"Kamada-Kawai Force-directed 3D")
+			LAYOUT_ALGO="kk3d"
+			;;
+		"Large Graph")
+			LAYOUT_ALGO="lgl"
+			;;
+		"Random")
+			LAYOUT_ALGO="random"
+			;;
+		"Random 3D")
+			LAYOUT_ALGO="random_3d"
+			;;
+		"Reingold-Tilford Tree")
+			LAYOUT_ALGO="rt"
+			;;
+		"Reingold-Tilford Tree Circular")
+			LAYOUT_ALGO="rt_circular"
+			;;
+		"Spherical")			
+			LAYOUT_ALGO="spherical"
+			;;
+		*)
+			LAYOUT_ALGO="auto"
+			;;
+	esac
+
 	cat /input/graph | grep -v "^#" > /input/graph.edgelist
         # Call the plotter
-        /scif/apps/generate_graph_visualization/scif/runscript --input_path /input/graph.edgelist --output_path /output/output.$OUTPUT_TYPE --layout_algorithm $ALGO --contract $CONTRACT --cluster $CLUSTER  --color $COLOR --output_width $WIDTH --output_height $HEIGHT --scale $SCALE --drop_isolates $DROP_ISOLATES && mv /output/output.$OUTPUT_TYPE /output/output.plot
+        /scif/apps/generate_graph_visualization/scif/runscript --input_path /input/graph.edgelist --output_path /output/output.$OUTPUT_TYPE --layout_algorithm $LAYOUT_ALGO --contract $CONTRACT --cluster $CLUSTER  --color $COLOR --output_width $WIDTH --output_height $HEIGHT --scale $SCALE --drop_isolates $DROP_ISOLATES && mv /output/output.$OUTPUT_TYPE /output/output.plot
 
