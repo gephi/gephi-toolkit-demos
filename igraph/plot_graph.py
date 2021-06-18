@@ -160,7 +160,7 @@ def main():
     if drop_isolates:
         G.delete_vertices(G.vs.select(_degree=0))
 
-    if color or contract:
+    if color == "comm_coloring" or contract:
         G.to_undirected()
         warnings.warn(UserWarning("Clustering will convert the graph to undirected."))
 
@@ -202,7 +202,12 @@ def main():
     # Scale based on node degree if requested.
     if scale:
         if scale != "degree":
+            # If we are not contracting into communities and these options are set, this is a problem.
+            if (scale == "comm_degree" or scale == "comm_size") and not contract:
+                raise ValueError("If scaling by community traits is requested (i.e. comm_degree or comm_size), then,"
+                                 "contract must also be true.")
             if scale == "comm_degree":
+                # Compute inter-community degree
                 sizes = np.fromiter(
                     (sum([sum(1 for neighbor in old_G.vs[node].neighbors() if neighbor not in best_cluster[comm.index])
                           for node in best_cluster[comm.index]]) for comm in
