@@ -40,6 +40,21 @@ pip install numpy
 	DROP_ISOLATES=`cat /job/job.json | jq -r .input.drop_isolates`
 	OUTPUT_TYPE=`cat /job/job.json | jq -r .input.output_type`
 
+	echo "CONTRACT: $CONTRACT"
+	echo "DROP_ISOLATES: $DROP_ISOLATES"
+
+        if [ "$CONTRACT" = "true" ]; then
+                CONTRACT="--contract "
+        else
+                CONTRACT=""
+        fi
+
+        if [ "$DROP_ISOLATES" = "true" ]; then
+                DROP_ISOLATES="--drop_isolates "
+        else
+                DROP_ISOLATES=""
+        fi
+
 	case $ALGO in
 		"Circular")
 			LAYOUT_ALGO="circle"
@@ -84,8 +99,11 @@ pip install numpy
 			LAYOUT_ALGO="auto"
 			;;
 	esac
-
+	echo "Stripping commented lines from input file."
 	cat /input/graph | grep -v "^#" > /input/graph.edgelist
         # Call the plotter
-        /scif/apps/generate_graph_visualization/scif/runscript --input_path /input/graph.edgelist --output_path /output/output.$OUTPUT_TYPE --layout_algorithm $LAYOUT_ALGO --contract $CONTRACT --cluster $CLUSTER  --color $COLOR --output_width $WIDTH --output_height $HEIGHT --scale $SCALE --drop_isolates $DROP_ISOLATES && mv /output/output.$OUTPUT_TYPE /output/output.plot
-
+	echo "Begin plotting"
+	CMDARGS="--input_path /input/graph.edgelist --output_path /output/output.$OUTPUT_TYPE --layout_algorithm $LAYOUT_ALGO $CONTRACT --cluster $CLUSTER  --color $COLOR --output_width $WIDTH --output_height $HEIGHT --scale $SCALE $DROP_ISOLATES"
+	echo "Arguments: $CMDARGS"
+        /scif/apps/generate_graph_visualization/scif/runscript $CMDARGS && mv /output/output.$OUTPUT_TYPE /output/output.plot && echo "Plotting Complete"
+	echo "Plotting complete"	

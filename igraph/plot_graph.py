@@ -15,7 +15,7 @@ parser.add_argument("--output_path", required=True, type=str, help="Path to outp
 parser.add_argument("-algo", "--layout_algorithm", required=False, default="auto", type=str, help="The layout algorithm"
                                                                                                   "that iGraph should "
                                                                                                   "use.")
-parser.add_argument('--contract', required=False, type=bool, help="If this flag is provided, the script will "
+parser.add_argument('--contract', dest="contract",action='store_true', default=False, required=False,  help="If this flag is provided, the script will "
                                                                   "attempt"
                                                                   "to contract nodes into their clusters. "
                                                                   "Recommended for larger graphs ~100k+.")
@@ -56,7 +56,7 @@ parser.add_argument("--output_height", required=False, default=1000,
                     type=int, help="Specify the output height in pixels.")
 parser.add_argument("--scale", required=False, type=str, help="If this flag is provided, the script will scale"
                                                               "the vertices by proportionally to their degree.")
-parser.add_argument("--drop_isolates", required=False, type=bool, help="If this flag is provided, the script will drop"
+parser.add_argument("--drop_isolates", action='store_true',dest="drop_isolates", required=False,default=False, help="If this flag is provided, the script will drop"
                                                                        "isolates from the graph plot.")
 
 
@@ -125,6 +125,8 @@ def main():
     color = args.color
     scale = args.scale
     drop_isolates = args.drop_isolates
+
+    print(f"Contract: {contract} Drop Isolates: {drop_isolates}")
     # Set the output size
     output_width, output_height = int(args.output_width), int(args.output_height)
     # Layout algorithm
