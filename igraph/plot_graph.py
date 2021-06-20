@@ -144,6 +144,8 @@ def main():
         print(e)
         print("Failed to load the graph from: " + input_path)
         exit(1)
+    print("Graph finished loading.")
+    print("======================")
 
     visual_style = {}
 
@@ -179,6 +181,9 @@ def main():
                     print(curr_cluster.summary())
                     best_cluster = curr_cluster
                     best_score = curr_score
+ 
+        print("Finishing clustering algorithm run.")
+        print("====================")
 
     if contract:
 
@@ -187,8 +192,13 @@ def main():
 
         G = best_cluster.cluster_graph()
 
+        print("Finished contracting graph.")
+        print("====================")
+         
         if color == "comm_coloring":
             G.vs['color'] = np.random.choice(colors, size=(G.vcount(),), replace=True)
+
+
 
     if color == "comm_coloring" and not contract:
         pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
@@ -199,6 +209,9 @@ def main():
     deg = G.degree()
     layout = G.layout(layout_algorithm)
 
+    print("Finished running layout algorithm.")
+    print("====================")
+    
     # Scale based on node degree if requested.
     if scale:
         if scale != "degree":
@@ -222,6 +235,8 @@ def main():
                 raise Exception(scale + " is not a valid scaling style.")
         else:
             G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
+        print("Finished scaling the nodes in plot.")
+        print("====================") 
     else:
         visual_style["vertex_size"] = vertex_size
 
@@ -229,6 +244,9 @@ def main():
     igraph.plot(G, layout=layout,
                 bbox=(output_width, output_height),
                 target=output_path, **visual_style)
+    print("Finished plotting the graph.")
+    print("Done.")
+    print("====================")
 
 
 if __name__ == '__main__':
