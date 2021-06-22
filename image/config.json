@@ -35,7 +35,7 @@
                     "cluster": {
                         "type": "string",
                         "description": "The type of clustering to be performed",
-                        "enum": ["components","cohesive_blocks","community_fastgreedy","community_infomap","community_label_propagation","community_leiden","community_multilevel","community_optimal_modularity","community_spinglass","community_walktrap"],
+                        "enum": ["components","cohesive_blocks","community_infomap","community_label_propagation","community_leiden","community_multilevel","community_optimal_modularity","community_spinglass","community_walktrap"],
                         "default": "community_multilevel"
                     },
                     "color": {
@@ -62,7 +62,7 @@
                     "scale": {
                         "type": "string",
                         "description": "Scale the verticies proportionally by their degree",
-                       	"enum": ["degree", "comm_degree"],
+                       	"enum": ["degree", "comm_degree", "comm_size"],
 			"default": "degree"
                     },
                     "drop_isolates": {
@@ -93,5 +93,5 @@
     ],
     "description": "A container that provides graph visualizations",
     "license": "BSD License",
-    "version": "1.0.0-17"
+    "version": "1.0.0-20"
 }
