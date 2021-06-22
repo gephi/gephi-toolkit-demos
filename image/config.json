@@ -32,6 +32,11 @@
                         "description": "If this flag is enabled, the script will 'attempt' to contract nodes into their clusters.",
                         "default": false
                     },
+                    "directed": {
+                        "type": "boolean",
+                        "description": "This switch will interpret the input file as a directed graph when provided. Otherwise, it is interpreted \n  as undirected.",
+                        "default": false
+                    },
                     "cluster": {
                         "type": "string",
                         "description": "The type of clustering to be performed",
