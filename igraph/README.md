@@ -77,6 +77,8 @@ the coloring will be applied based on the community selected for the contraction
 
 * drop_isolates - This removes isolates. It will be run prior to any clustering.
 
+* directed - This switch will interpret the input file as a directed graph when provided. Otherwise, it is interpreted 
+  as undirected.
 ### Layout algorithm options:
 
 layout_circle

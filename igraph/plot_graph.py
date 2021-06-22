@@ -15,10 +15,14 @@ parser.add_argument("--output_path", required=True, type=str, help="Path to outp
 parser.add_argument("-algo", "--layout_algorithm", required=False, default="auto", type=str, help="The layout algorithm"
                                                                                                   "that iGraph should "
                                                                                                   "use.")
-parser.add_argument('--contract', dest="contract",action='store_true', default=False, required=False,  help="If this flag is provided, the script will "
-                                                                  "attempt"
-                                                                  "to contract nodes into their clusters. "
-                                                                  "Recommended for larger graphs ~100k+.")
+parser.add_argument('--contract', dest="contract", action='store_true', default=False, required=False,
+                    help="If this flag is provided, the script will "
+                         "attempt"
+                         "to contract nodes into their clusters. "
+                         "Recommended for larger graphs ~100k+.")
+parser.add_argument('--directed', dest="directed", action='store_true', default=False, required=False,
+                    help="If this flag is provided, the script will "
+                         "interpret the input Graph as directed.")
 parser.add_argument("--color", required=False, type=str, help="This CLA may have three types of values. 1."
                                                               "comm_coloring - This colors the nodes by their "
                                                               "community. "
@@ -56,8 +60,9 @@ parser.add_argument("--output_height", required=False, default=1000,
                     type=int, help="Specify the output height in pixels.")
 parser.add_argument("--scale", required=False, type=str, help="If this flag is provided, the script will scale"
                                                               "the vertices by proportionally to their degree.")
-parser.add_argument("--drop_isolates", action='store_true',dest="drop_isolates", required=False,default=False, help="If this flag is provided, the script will drop"
-                                                                       "isolates from the graph plot.")
+parser.add_argument("--drop_isolates", action='store_true', dest="drop_isolates", required=False, default=False,
+                    help="If this flag is provided, the script will drop"
+                         "isolates from the graph plot.")
 
 
 def cluster(G, algo_str):
@@ -108,6 +113,8 @@ def main():
     args = parser.parse_args()
     # Path Arguments
     input_path = args.input_path
+    # Graph Metadata
+    directed = args.directed
     # Check if the format is valid.
     if input_path.split(".")[-1].lower() not in input_formats:
         print("The input file extension is " + input_path.split(".")[-1].lower() + " is not a supported input format.")
@@ -138,7 +145,7 @@ def main():
 
     # Attempt to load the graph
     try:
-        G = igraph.Graph.Load(input_path)
+        G = igraph.Graph.Load(input_path, directed=directed)
     except Exception as e:
         tb.print_exc()
         print(e)
@@ -153,8 +160,8 @@ def main():
     total_pixels = output_width * output_height
     # Scale the vertex and arrow size based on the number of output pixels
     vertex_size = min(total_pixels / ((G.vcount() * 6) + 1), 15)
-    arrow_size = .5
-    arrow_width = .5
+    arrow_size = 1
+    arrow_width = 1
     visual_style["edge_arrow_size"] = arrow_size
     visual_style["edge_arrow_width"] = arrow_width
 
@@ -176,12 +183,9 @@ def main():
                 curr_cluster = cluster(G, clustering)
                 curr_score = float(curr_cluster.modularity)
                 if best_score < float(curr_score):
-                    print(best_score < curr_score)
-                    print(clustering)
-                    print(curr_cluster.summary())
                     best_cluster = curr_cluster
                     best_score = curr_score
- 
+
         print("Finishing clustering algorithm run.")
         print("====================")
 
@@ -194,11 +198,9 @@ def main():
 
         print("Finished contracting graph.")
         print("====================")
-         
+
         if color == "comm_coloring":
             G.vs['color'] = np.random.choice(colors, size=(G.vcount(),), replace=True)
-
-
 
     if color == "comm_coloring" and not contract:
         pal = igraph.drawing.colors.ClusterColoringPalette(len(best_cluster))
@@ -211,7 +213,7 @@ def main():
 
     print("Finished running layout algorithm.")
     print("====================")
-    
+
     # Scale based on node degree if requested.
     if scale:
         if scale != "degree":
@@ -230,13 +232,14 @@ def main():
                 G.vs["size"] = sizes
             elif scale == "comm_size":
                 sizes = best_cluster.sizes()
+                # Scale the nodes by the size of their communities
                 G.vs["size"] = (((sizes - np.mean(sizes)) / ((2 * np.std(sizes)) + 1)) * vertex_size) + vertex_size
             else:
                 raise Exception(scale + " is not a valid scaling style.")
         else:
             G.vs["size"] = (((deg - np.mean(deg)) / ((2 * np.std(deg)) + 1)) * vertex_size) + vertex_size
         print("Finished scaling the nodes in plot.")
-        print("====================") 
+        print("====================")
     else:
         visual_style["vertex_size"] = vertex_size
 
