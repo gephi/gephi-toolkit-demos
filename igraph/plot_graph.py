@@ -58,11 +58,16 @@ parser.add_argument("--output_width", required=False, default=2000,
                     type=int, help="Specify the output width in pixels.")
 parser.add_argument("--output_height", required=False, default=1000,
                     type=int, help="Specify the output height in pixels.")
-parser.add_argument("--scale", required=False, type=str, help="If this flag is provided, the script will scale"
-                                                              "the vertices by proportionally to their degree.")
+parser.add_argument("--scale", required=False, type=str, help="This string argument that takes three possible values"
+                                                              ": degree, comm_degree, and comm_size. These determine"
+                                                              " how nodes are scaled if at all.")
 parser.add_argument("--drop_isolates", action='store_true', dest="drop_isolates", required=False, default=False,
                     help="If this flag is provided, the script will drop"
                          "isolates from the graph plot.")
+parser.add_argument("--multi_edges", action='store_true', dest="multi_edges", required=False, default=False,
+                    help="Remove multi-edges if this flag is not set.")
+parser.add_argument("--self_loops", action='store_true', dest="self_loops", required=False, default=False,
+                    help="Remove self loops if this flag is not set.")
 
 
 def cluster(G, algo_str):
@@ -132,6 +137,8 @@ def main():
     color = args.color
     scale = args.scale
     drop_isolates = args.drop_isolates
+    self_loops = args.self_loops
+    mulit_edges = args.multi_edges
 
     print(f"Contract: {contract} Drop Isolates: {drop_isolates}")
     # Set the output size
@@ -145,7 +152,7 @@ def main():
 
     # Attempt to load the graph
     try:
-        G = igraph.Graph.Load(input_path, directed=directed)
+        G = igraph.Graph.Load(input_path, directed=directed).simplify(multiple=not mulit_edges, loops=not self_loops)
     except Exception as e:
         tb.print_exc()
         print(e)

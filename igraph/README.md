@@ -79,6 +79,13 @@ the coloring will be applied based on the community selected for the contraction
 
 * directed - This switch will interpret the input file as a directed graph when provided. Otherwise, it is interpreted 
   as undirected.
+  
+* multi_edges - This switch will allow multi-edges in the output plot. If not provided, multi-edges will be removed from
+the plot.
+  
+* self_loops - This switch will allow self-loops in the output plot. If not provided, self-loops will be removed from
+the plot.
+  
 ### Layout algorithm options:
 
 layout_circle
