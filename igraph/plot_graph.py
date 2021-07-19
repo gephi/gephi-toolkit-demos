@@ -2,10 +2,10 @@ __author__ = "Henry Carscadden"
 __contact__ = "hlc5v@virginia.edu"
 
 import numpy as np
-import traceback as tb
 import igraph
 import warnings
 import argparse
+import traceback as tb
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_path", required=True, type=str, help="Path to input file.")
@@ -52,8 +52,7 @@ parser.add_argument("--cluster", required=False,
                                                                                 "community_spinglass, "
                                                                                 "community_walktrap. "
                                                                                 "If none is selected "
-                                                                                " community_multilevel is used."
-                    )
+                                                                                " community_multilevel is used.")
 parser.add_argument("--output_width", required=False, default=2000,
                     type=int, help="Specify the output width in pixels.")
 parser.add_argument("--output_height", required=False, default=1000,
@@ -61,13 +60,16 @@ parser.add_argument("--output_height", required=False, default=1000,
 parser.add_argument("--scale", required=False, type=str, help="This string argument that takes three possible values"
                                                               ": degree, comm_degree, and comm_size. These determine"
                                                               " how nodes are scaled if at all.")
+# This flag manaages isolates.
 parser.add_argument("--drop_isolates", action='store_true', dest="drop_isolates", required=False, default=False,
                     help="If this flag is provided, the script will drop"
                          "isolates from the graph plot.")
+# These flags are to manage whether or not multi-edges/self-loops are allowed.
 parser.add_argument("--multi_edges", action='store_true', dest="multi_edges", required=False, default=False,
                     help="Remove multi-edges if this flag is not set.")
 parser.add_argument("--self_loops", action='store_true', dest="self_loops", required=False, default=False,
                     help="Remove self loops if this flag is not set.")
+
 
 
 def cluster(G, algo_str):
@@ -107,6 +109,60 @@ def cluster(G, algo_str):
     else:
         print(algo_str)
         raise ValueError("Invalid clustering algorithm name.")
+
+
+def load_graph(input_path: str, directed: bool, multi_edges: bool, self_loops: bool):
+    """
+    A helper function used to perform the graph loading part of the plot.
+    :param input_path: A string path to the input graph file.
+    :param directed: A boolean that decides whether the graph is interpreted as directed.
+    :param multi_edges: A boolean that decides whether the graph allows multi-edges.
+    :param self_loops: A boolean that decides whether the graph allows self-loops
+    :return: The loaded igraph Graph object.
+    """
+    G = igraph.Graph()
+    try:
+        G = igraph.Graph.Load(input_path, directed=directed)
+        # If a graph is not a simple, the graph should have multi-edges and self-loops removed if they are not allowed.
+        if not multi_edges or not self_loops:
+            if not G.is_simple():
+                G = G.simplify(multiple=not multi_edges, loops=not self_loops)
+                warnings.warn(UserWarning("WARNING: The input graph had either self-loops or multi-edges. "
+                                          "You set allow multi-edges to : " + str(multi_edges) + ". You set allow "
+                                          "self-loops to: " + str(self_loops) + ". Those you set to false caused "
+                                          "multi-edges and/or self-loops to be removed."))
+    except Exception as e:
+        tb.print_exc()
+        print(e)
+        print("Failed to load the graph from: " + input_path)
+        exit(1)
+    finally:
+        return G
+
+
+def compute_best_clustering(G: igraph.Graph, clusterings: list):
+    """
+    Computes the best clustering using modularity score for input graph.
+    :param G: The input graph.
+    :param clusterings: The list of igraph clustering algorithms to try:
+    :return: The highest modularity score clustering found.
+    """
+    G.to_undirected()
+    warnings.warn(UserWarning("Clustering will convert the graph to undirected."))
+    # Find the best clustering from all of those provided.
+    best_cluster = None
+    best_score = 0
+    for clustering in clusterings:
+        if best_cluster is None:
+            best_cluster = cluster(G, clustering)
+            best_score = float(best_cluster.modularity)
+        else:
+            curr_cluster = cluster(G, clustering)
+            curr_score = float(curr_cluster.modularity)
+            if best_score < float(curr_score):
+                best_cluster = curr_cluster
+                best_score = curr_score
+    return  best_cluster
 
 
 output_formats = ["pdf", "png", "svg", "ps", "eps"]
@@ -150,22 +206,10 @@ def main():
 
     colors = ["red", "blue", "black", "brown", "green", "orange", "yellow", "magenta", "lime", "indigo", "cyan"]
 
+    print("Beginning Graph Loading.")
     # Attempt to load the graph
-    try:
-        G = igraph.Graph.Load(input_path, directed=directed)
-        # If a graph is not a simple, the graph should have multi-edges and self-loops removed if they are not allowed.
-        if not multi_edges or not self_loops:
-            if not G.is_simple():
-                G = G.simplify(multiple=not multi_edges, loops=not self_loops)
-                warnings.warn(UserWarning("WARNING: The input graph had either self-loops or multi-edges. "
-                                          "You set allow multi-edges to : " + str(multi_edges) + ". You set allow "
-                                          "self-loops to: " + str(self_loops) + ". Those you set to false caused "
-                                          "multi-edges and/or self-loops to be removed."))
-    except Exception as e:
-        tb.print_exc()
-        print(e)
-        print("Failed to load the graph from: " + input_path)
-        exit(1)
+    G = load_graph(input_path=input_path, directed=directed, multi_edges=multi_edges, self_loops=self_loops)
+
     print("Graph finished loading.")
     print("======================")
 
@@ -184,23 +228,10 @@ def main():
     if drop_isolates:
         G.delete_vertices(G.vs.select(_degree=0))
 
+    best_cluster = None
     if color == "comm_coloring" or contract:
-        G.to_undirected()
-        warnings.warn(UserWarning("Clustering will convert the graph to undirected."))
-        # Find the best clustering from all of those provided.
-        best_cluster = None
-        best_score = 0
-        for clustering in clusterings:
-            if best_cluster is None:
-                best_cluster = cluster(G, clustering)
-                best_score = float(best_cluster.modularity)
-            else:
-                curr_cluster = cluster(G, clustering)
-                curr_score = float(curr_cluster.modularity)
-                if best_score < float(curr_score):
-                    best_cluster = curr_cluster
-                    best_score = curr_score
-
+        print("Starting clustering computation.")
+        best_cluster = compute_best_clustering(G=G, clusterings=clusterings)
         print("Finishing clustering algorithm run.")
         print("====================")
 
