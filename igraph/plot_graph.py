@@ -7,6 +7,8 @@ import warnings
 import argparse
 import traceback as tb
 
+MAX_NODE_COUNT = 1000
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_path", required=True, type=str, help="Path to input file.")
 parser.add_argument("--output_path", required=True, type=str, help="Path to output file.")
@@ -69,7 +71,9 @@ parser.add_argument("--multi_edges", action='store_true', dest="multi_edges", re
                     help="Remove multi-edges if this flag is not set.")
 parser.add_argument("--self_loops", action='store_true', dest="self_loops", required=False, default=False,
                     help="Remove self loops if this flag is not set.")
-
+# This flag manages whether or not node labels are shown.
+parser.add_argument("--node_labels", action="store_true", dest="node_labels", required=False, default=False,
+                    help="If this flag is set, the node labels in the input edge file are plotted on the graph.")
 
 
 def cluster(G, algo_str):
@@ -111,26 +115,32 @@ def cluster(G, algo_str):
         raise ValueError("Invalid clustering algorithm name.")
 
 
-def load_graph(input_path: str, directed: bool, multi_edges: bool, self_loops: bool):
+def load_graph(input_path: str, directed: bool, multi_edges: bool, self_loops: bool, node_labels: bool):
     """
     A helper function used to perform the graph loading part of the plot.
-    :param input_path: A string path to the input graph file.
+    :param input_path: A string path to the input graph files.
     :param directed: A boolean that decides whether the graph is interpreted as directed.
     :param multi_edges: A boolean that decides whether the graph allows multi-edges.
-    :param self_loops: A boolean that decides whether the graph allows self-loops
+    :param self_loops: A boolean that decides whether the graph allows self-loops.
+    :param node_labels: A boolean that when set treat the input file as ncol file.
     :return: The loaded igraph Graph object.
     """
     G = igraph.Graph()
     try:
-        G = igraph.Graph.Load(input_path, directed=directed)
+        if node_labels:
+            G = igraph.Graph.Read_Ncol(input_path, directed=directed)
+        else:
+            G = igraph.Graph.Load(input_path, directed=directed)
+
         # If a graph is not a simple, the graph should have multi-edges and self-loops removed if they are not allowed.
         if not multi_edges or not self_loops:
             if not G.is_simple():
                 G = G.simplify(multiple=not multi_edges, loops=not self_loops)
                 warnings.warn(UserWarning("WARNING: The input graph had either self-loops or multi-edges. "
                                           "You set allow multi-edges to : " + str(multi_edges) + ". You set allow "
-                                          "self-loops to: " + str(self_loops) + ". Those you set to false caused "
-                                          "multi-edges and/or self-loops to be removed."))
+                                                                                                 "self-loops to: " + str(
+                    self_loops) + ". Those you set to false caused "
+                                  "multi-edges and/or self-loops to be removed."))
     except Exception as e:
         tb.print_exc()
         print(e)
@@ -162,7 +172,7 @@ def compute_best_clustering(G: igraph.Graph, clusterings: list):
             if best_score < float(curr_score):
                 best_cluster = curr_cluster
                 best_score = curr_score
-    return  best_cluster
+    return best_cluster
 
 
 output_formats = ["pdf", "png", "svg", "ps", "eps"]
@@ -203,12 +213,24 @@ def main():
     layout_algorithm = args.layout_algorithm
     # The clustering algorithm to try.
     clusterings = args.cluster
+    # Should the input file be interpreted with node labels for the output plot
+    node_labels = args.node_labels
+    if node_labels:
+        if contract:
+            raise ValueError(
+                "The --node_labels and --contract flags cannot both be set. This would result in invalid node"
+                "labels.")
+        edge_list_like = ["ncol", "edge", "edges", "edgelist"]
+        if input_path.split(".")[-1].lower() not in edge_list_like:
+            raise ValueError("The --node_labels argument only works for the following formats: " +
+                             str(edge_list_like))
 
     colors = ["red", "blue", "black", "brown", "green", "orange", "yellow", "magenta", "lime", "indigo", "cyan"]
 
     print("Beginning Graph Loading.")
     # Attempt to load the graph
-    G = load_graph(input_path=input_path, directed=directed, multi_edges=multi_edges, self_loops=self_loops)
+    G = load_graph(input_path=input_path, directed=directed, multi_edges=multi_edges, self_loops=self_loops,
+                   node_labels=node_labels)
 
     print("Graph finished loading.")
     print("======================")
@@ -253,6 +275,12 @@ def main():
         G.vs['color'] = pal.get_many(best_cluster.membership)
     elif color in colors:
         G.vs["color"] = color
+
+    # Set the plot attribute for node labels to the name attribute.
+    if node_labels:
+        if len(G.vs) > MAX_NODE_COUNT:
+            raise ValueError("There are too many nodes in the graph to plot the labels.")
+        G.vs["label"] = G.vs["name"]
 
     deg = G.degree()
     layout = G.layout(layout_algorithm)

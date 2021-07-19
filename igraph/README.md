@@ -86,6 +86,9 @@ the plot.
 * self_loops - This switch will allow self-loops in the output plot. If not provided, self-loops will be removed from
 the plot.
   
+* node_labels - If the input file is an edge list file, the node IDs in the edge list will be saved and used as the name
+attribute in the loaded igraph object. These names will be plotted in the output graph unless the number of nodes is too
+  high.
 ### Layout algorithm options:
 
 layout_circle
