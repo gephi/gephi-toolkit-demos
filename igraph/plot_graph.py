@@ -138,7 +138,7 @@ def main():
     scale = args.scale
     drop_isolates = args.drop_isolates
     self_loops = args.self_loops
-    mulit_edges = args.multi_edges
+    multi_edges = args.multi_edges
 
     print(f"Contract: {contract} Drop Isolates: {drop_isolates}")
     # Set the output size
@@ -152,7 +152,15 @@ def main():
 
     # Attempt to load the graph
     try:
-        G = igraph.Graph.Load(input_path, directed=directed).simplify(multiple=not mulit_edges, loops=not self_loops)
+        G = igraph.Graph.Load(input_path, directed=directed)
+        # If a graph is not a simple, the graph should have multi-edges and self-loops removed if they are not allowed.
+        if not multi_edges or not self_loops:
+            if not G.is_simple():
+                G = G.simplify(multiple=not multi_edges, loops=not self_loops)
+                warnings.warn(UserWarning("WARNING: The input graph had either self-loops or multi-edges. "
+                                          "You set allow multi-edges to : " + str(multi_edges) + ". You set allow "
+                                          "self-loops to: " + str(self_loops) + ". Those you set to false caused "
+                                          "multi-edges and/or self-loops to be removed."))
     except Exception as e:
         tb.print_exc()
         print(e)
@@ -179,7 +187,7 @@ def main():
     if color == "comm_coloring" or contract:
         G.to_undirected()
         warnings.warn(UserWarning("Clustering will convert the graph to undirected."))
-
+        # Find the best clustering from all of those provided.
         best_cluster = None
         best_score = 0
         for clustering in clusterings:
