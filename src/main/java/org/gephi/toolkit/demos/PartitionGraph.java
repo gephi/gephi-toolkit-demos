@@ -98,10 +98,10 @@ public class PartitionGraph {
 
         //Partition with 'source' column, which is in the data
         Column column = graphModel.getNodeTable().getColumn("source");
-        Function func = appearanceModel.getNodeFunction(graph, column, PartitionElementColorTransformer.class);
+        Function func = appearanceModel.getNodeFunction(column, PartitionElementColorTransformer.class);
         Partition partition = ((PartitionFunction) func).getPartition();
-        Palette palette = PaletteManager.getInstance().generatePalette(partition.size());
-        partition.setColors(palette.getColors());
+        Palette palette = PaletteManager.getInstance().generatePalette(partition.size(graph));
+        partition.setColors(graph, palette.getColors());
         appearanceController.transform(func);
 
         //Export
@@ -119,11 +119,11 @@ public class PartitionGraph {
 
         //Partition with 'modularity_class', just created by Modularity algorithm
         Column modColumn = graphModel.getNodeTable().getColumn(Modularity.MODULARITY_CLASS);
-        Function func2 = appearanceModel.getNodeFunction(graph, modColumn, PartitionElementColorTransformer.class);
+        Function func2 = appearanceModel.getNodeFunction(modColumn, PartitionElementColorTransformer.class);
         Partition partition2 = ((PartitionFunction) func2).getPartition();
-        System.out.println(partition2.size() + " partitions found");
-        Palette palette2 = PaletteManager.getInstance().randomPalette(partition2.size());
-        partition2.setColors(palette2.getColors());
+        System.out.println(partition2.size(graph) + " partitions found");
+        Palette palette2 = PaletteManager.getInstance().randomPalette(partition2.size(graph));
+        partition2.setColors(graph, palette2.getColors());
         appearanceController.transform(func2);
 
         //Export

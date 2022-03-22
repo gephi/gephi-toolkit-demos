@@ -51,6 +51,11 @@ public class RendererTemplate implements Renderer, MouseResponsiveRenderer {
     }
 
     @Override
+    public void postProcess(PreviewModel previewModel, RenderTarget target,
+                            PreviewProperties properties) {
+    }
+
+    @Override
     public void render(Item item, RenderTarget target, PreviewProperties properties) {
         //Retrieve clicked node for the label:
         LabelItem label = (LabelItem) item;

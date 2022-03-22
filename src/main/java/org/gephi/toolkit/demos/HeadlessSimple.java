@@ -139,15 +139,16 @@ public class HeadlessSimple {
         distance.execute(graphModel);
 
         //Rank color by Degree
-        Function degreeRanking = appearanceModel.getNodeFunction(graph, AppearanceModel.GraphFunction.NODE_DEGREE, RankingElementColorTransformer.class);
-        RankingElementColorTransformer degreeTransformer = (RankingElementColorTransformer) degreeRanking.getTransformer();
+        Function degreeRanking = appearanceModel.getNodeFunction(graphModel.defaultColumns()
+            .degree(), RankingElementColorTransformer.class);
+        RankingElementColorTransformer degreeTransformer = degreeRanking.getTransformer();
         degreeTransformer.setColors(new Color[]{new Color(0xFEF0D9), new Color(0xB30000)});
         degreeTransformer.setColorPositions(new float[]{0f, 1f});
         appearanceController.transform(degreeRanking);
 
         //Rank size by centrality
         Column centralityColumn = graphModel.getNodeTable().getColumn(GraphDistance.BETWEENNESS);
-        Function centralityRanking = appearanceModel.getNodeFunction(graph, centralityColumn, RankingNodeSizeTransformer.class);
+        Function centralityRanking = appearanceModel.getNodeFunction(centralityColumn, RankingNodeSizeTransformer.class);
         RankingNodeSizeTransformer centralityTransformer = (RankingNodeSizeTransformer) centralityRanking.getTransformer();
         centralityTransformer.setMinSize(3);
         centralityTransformer.setMaxSize(10);

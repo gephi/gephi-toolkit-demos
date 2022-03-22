@@ -94,8 +94,9 @@ public class RankingGraph {
         System.out.println("Edges: " + graph.getEdgeCount());
 
         //Rank color by Degree
-        Function degreeRanking = appearanceModel.getNodeFunction(graph, AppearanceModel.GraphFunction.NODE_DEGREE, RankingElementColorTransformer.class);
-        RankingElementColorTransformer degreeTransformer = (RankingElementColorTransformer) degreeRanking.getTransformer();
+        Function degreeRanking = appearanceModel.getNodeFunction(graphModel.defaultColumns()
+            .degree(), RankingElementColorTransformer.class);
+        RankingElementColorTransformer degreeTransformer = degreeRanking.getTransformer();
         degreeTransformer.setColors(new Color[]{new Color(0xFEF0D9), new Color(0xB30000)});
         degreeTransformer.setColorPositions(new float[]{0f, 1f});
         appearanceController.transform(degreeRanking);
@@ -107,14 +108,14 @@ public class RankingGraph {
 
         //Rank size by centrality
         Column centralityColumn = graphModel.getNodeTable().getColumn(GraphDistance.BETWEENNESS);
-        Function centralityRanking = appearanceModel.getNodeFunction(graph, centralityColumn, RankingNodeSizeTransformer.class);
+        Function centralityRanking = appearanceModel.getNodeFunction(centralityColumn, RankingNodeSizeTransformer.class);
         RankingNodeSizeTransformer centralityTransformer = (RankingNodeSizeTransformer) centralityRanking.getTransformer();
         centralityTransformer.setMinSize(3);
         centralityTransformer.setMaxSize(10);
         appearanceController.transform(centralityRanking);
 
         //Rank label size - set a multiplier size
-        Function centralityRanking2 = appearanceModel.getNodeFunction(graph, centralityColumn, RankingLabelSizeTransformer.class);
+        Function centralityRanking2 = appearanceModel.getNodeFunction(centralityColumn, RankingLabelSizeTransformer.class);
         RankingLabelSizeTransformer labelSizeTransformer = (RankingLabelSizeTransformer) centralityRanking2.getTransformer();
         labelSizeTransformer.setMinSize(1);
         labelSizeTransformer.setMaxSize(3);
