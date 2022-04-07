@@ -8,7 +8,7 @@ The toolkit is just a single JAR that anyone could reuse in a Java program. This
 
 - Open the project in Netbeans IDE.
 - Each demo is independent from each other.
-- Run demos by calling script() method.
+- Run demos by calling script() method or via maven `mvn exec:java -Dexec.mainClass="org.gephi.toolkit.demos.Main"`.
 - Change the main class to execute a demo
 
 Consult the Gephi Toolkit [Javadoc](https://gephi.org/gephi-toolkit/0.9.2/apidocs/) for help.
