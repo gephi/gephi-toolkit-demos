@@ -20,7 +20,7 @@ along with Gephi.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gephi.toolkit.demos;
 
-import com.itextpdf.text.PageSize;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -107,7 +107,7 @@ public class ImportExport {
 
         //PDF Exporter config and export to Byte array
         PDFExporter pdfExporter = (PDFExporter) ec.getExporter("pdf");
-        pdfExporter.setPageSize(PageSize.A0);
+        pdfExporter.setPageSize(PDRectangle.A0);
         pdfExporter.setWorkspace(workspace);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ec.exportStream(baos, pdfExporter);

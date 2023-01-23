@@ -100,7 +100,7 @@ public class Filtering {
         System.out.println("Nodes: " + graph.getNodeCount() + " Edges: " + graph.getEdgeCount());
 
         //Filter, keep partition 'Blogarama'. Build partition with 'source' column in the data
-        NodePartitionFilter partitionFilter = new NodePartitionFilter(appearanceModel.getNodePartition(graphModel.getNodeTable().getColumn("source")));
+        NodePartitionFilter partitionFilter = new NodePartitionFilter(appearanceModel,appearanceModel.getNodePartition(graphModel.getNodeTable().getColumn("source")));
         partitionFilter.unselectAll();
         partitionFilter.addPart("Blogarama");
         Query query2 = filterController.createQuery(partitionFilter);
