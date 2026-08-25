@@ -21,6 +21,8 @@ along with Gephi.  If not, see <http://www.gnu.org/licenses/>.
 package org.gephi.toolkit.demos;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -40,7 +42,6 @@ import org.gephi.layout.plugin.force.StepDisplacement;
 import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 
 /**
@@ -72,19 +73,16 @@ public class SQLiteImportExport {
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
 
-        //Copy example database to tmp
+        //Copy the example database to the demo output directory
         File temp;
         try {
             File file = new File(getClass().getResource("/org/gephi/toolkit/demos/lesmiserables.sqlite3").toURI());
-            temp = new File(System.getProperty("java.io.tmpdir"));
-            FileUtil.copyFile(FileUtil.toFileObject(file), FileUtil.toFileObject(temp), "lesmiserables");
-            temp = new File(temp, "lesmiserables.sqlite3");
-            temp.deleteOnExit();
+            temp = DemoOutput.file("lesmiserables.sqlite3");
+            Files.copy(file.toPath(), temp.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception ex) {
             ex.printStackTrace();
             return;
         }
-        temp.deleteOnExit();
 
         //Import database
         EdgeListDatabaseImpl db = new EdgeListDatabaseImpl();

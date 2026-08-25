@@ -20,7 +20,6 @@ along with Gephi.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gephi.toolkit.demos;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import org.gephi.graph.api.DirectedGraph;
@@ -76,8 +75,8 @@ public class WithAutoLayout {
         System.out.println("Nodes: " + graph.getNodeCount());
         System.out.println("Edges: " + graph.getEdgeCount());
 
-        //Layout for 1 minute
-        AutoLayout autoLayout = new AutoLayout(1, TimeUnit.MINUTES);
+        //Layout for 10 seconds
+        AutoLayout autoLayout = new AutoLayout(10, TimeUnit.SECONDS);
         autoLayout.setGraphModel(graphModel);
         YifanHuLayout firstLayout = new YifanHuLayout(null, new StepDisplacement(1f));
         ForceAtlasLayout secondLayout = new ForceAtlasLayout(null);
@@ -88,9 +87,10 @@ public class WithAutoLayout {
         autoLayout.execute();
 
         //Export
+        DemoPreview.configureStraightEdges();
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
-            ec.exportFile(new File("autolayout.pdf"));
+            ec.exportFile(DemoOutput.file("autolayout.pdf"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

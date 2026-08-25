@@ -23,6 +23,7 @@ package org.gephi.toolkit.demos;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import org.gephi.appearance.api.AppearanceController;
 import org.gephi.appearance.api.AppearanceModel;
 import org.gephi.appearance.api.Function;
@@ -38,7 +39,8 @@ import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.EdgeDirectionDefault;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.processor.plugin.DefaultProcessor;
-import org.gephi.preview.api.PreviewController;
+import org.gephi.layout.plugin.AutoLayout;
+import org.gephi.layout.plugin.forceAtlas.ForceAtlasLayout;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.project.api.ProjectController;
@@ -93,6 +95,15 @@ public class RankingGraph {
         System.out.println("Nodes: " + graph.getNodeCount());
         System.out.println("Edges: " + graph.getEdgeCount());
 
+        //Run ForceAtlas for three seconds before ranking and previewing
+        AutoLayout autoLayout = new AutoLayout(3, TimeUnit.SECONDS);
+        autoLayout.setGraphModel(graphModel);
+        ForceAtlasLayout forceAtlasLayout = new ForceAtlasLayout(null);
+        forceAtlasLayout.resetPropertiesValues();
+        forceAtlasLayout.setAdjustSizes(Boolean.TRUE);
+        autoLayout.addLayout(forceAtlasLayout, 1.0f);
+        autoLayout.execute();
+
         //Rank color by Degree
         Function degreeRanking = appearanceModel.getNodeFunction(graphModel.defaultColumns()
             .degree(), RankingElementColorTransformer.class);
@@ -122,14 +133,14 @@ public class RankingGraph {
         appearanceController.transform(centralityRanking2);
 
         //Set 'show labels' option in Preview - and disable node size influence on text size
-        PreviewModel previewModel = Lookup.getDefault().lookup(PreviewController.class).getModel();
+        PreviewModel previewModel = DemoPreview.configureStraightEdges();
         previewModel.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
         previewModel.getProperties().putValue(PreviewProperty.NODE_LABEL_PROPORTIONAL_SIZE, Boolean.FALSE);
 
         //Export
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
-            ec.exportFile(new File("ranking.pdf"));
+            ec.exportFile(DemoOutput.file("ranking.pdf"));
         } catch (IOException ex) {
             ex.printStackTrace();
             return;

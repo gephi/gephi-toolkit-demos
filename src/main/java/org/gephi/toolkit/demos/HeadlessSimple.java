@@ -45,7 +45,6 @@ import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.layout.plugin.force.StepDisplacement;
 import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
-import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.types.EdgeColor;
@@ -83,7 +82,7 @@ public class HeadlessSimple {
 
         //Get models and controllers for this new workspace - will be useful later
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel();
-        PreviewModel model = Lookup.getDefault().lookup(PreviewController.class).getModel();
+        PreviewModel model = DemoPreview.configureStraightEdges();
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
         FilterController filterController = Lookup.getDefault().lookup(FilterController.class);
         AppearanceController appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
@@ -163,7 +162,7 @@ public class HeadlessSimple {
         //Export
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
-            ec.exportFile(new File("headless_simple.pdf"));
+            ec.exportFile(DemoOutput.file("headless_simple.pdf"));
         } catch (IOException ex) {
             ex.printStackTrace();
             return;

@@ -81,7 +81,7 @@ public class ImportExport {
         //Export full graph
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
-            ec.exportFile(new File("io_gexf.gexf"));
+            ec.exportFile(DemoOutput.file("io_gexf.gexf"));
         } catch (IOException ex) {
             ex.printStackTrace();
             return;
@@ -92,7 +92,7 @@ public class ImportExport {
         exporter.setExportVisible(true);  //Only exports the visible (filtered) graph
         exporter.setWorkspace(workspace);
         try {
-            ec.exportFile(new File("io_gexf.gexf"), exporter);
+            ec.exportFile(DemoOutput.file("io_gexf.gexf"), exporter);
         } catch (IOException ex) {
             ex.printStackTrace();
             return;
@@ -106,6 +106,7 @@ public class ImportExport {
         //System.out.println(stringWriter.toString());   //Uncomment this line
 
         //PDF Exporter config and export to Byte array
+        DemoPreview.configureStraightEdges();
         PDFExporter pdfExporter = (PDFExporter) ec.getExporter("pdf");
         pdfExporter.setPageSize(PDRectangle.A0);
         pdfExporter.setWorkspace(workspace);

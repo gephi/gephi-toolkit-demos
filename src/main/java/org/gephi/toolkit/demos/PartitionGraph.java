@@ -23,6 +23,7 @@ package org.gephi.toolkit.demos;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import org.gephi.appearance.api.AppearanceController;
 import org.gephi.appearance.api.AppearanceModel;
 import org.gephi.appearance.api.Function;
@@ -40,6 +41,8 @@ import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.EdgeDirectionDefault;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.layout.plugin.AutoLayout;
+import org.gephi.layout.plugin.forceAtlas.ForceAtlasLayout;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.Modularity;
@@ -96,6 +99,18 @@ public class PartitionGraph {
         System.out.println("Nodes: " + graph.getNodeCount());
         System.out.println("Edges: " + graph.getEdgeCount());
 
+        //Run ForceAtlas for three seconds before previewing the graph
+        AutoLayout autoLayout = new AutoLayout(3, TimeUnit.SECONDS);
+        autoLayout.setGraphModel(graphModel);
+        ForceAtlasLayout forceAtlasLayout = new ForceAtlasLayout(null);
+        forceAtlasLayout.resetPropertiesValues();
+        forceAtlasLayout.setAdjustSizes(Boolean.TRUE);
+        autoLayout.addLayout(forceAtlasLayout, 1.0f);
+        autoLayout.execute();
+
+        //Straight edges avoid invalid curved-arrow geometry for very close nodes
+        DemoPreview.configureStraightEdges();
+
         //Partition with 'source' column, which is in the data
         Column column = graphModel.getNodeTable().getColumn("source");
         Function func = appearanceModel.getNodeFunction(column, PartitionElementColorTransformer.class);
@@ -107,7 +122,7 @@ public class PartitionGraph {
         //Export
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
-            ec.exportFile(new File("partition1.pdf"));
+            ec.exportFile(DemoOutput.file("partition1.pdf"));
         } catch (IOException ex) {
             ex.printStackTrace();
             return;
@@ -128,7 +143,7 @@ public class PartitionGraph {
 
         //Export
         try {
-            ec.exportFile(new File("partition2.pdf"));
+            ec.exportFile(DemoOutput.file("partition2.pdf"));
         } catch (IOException ex) {
             ex.printStackTrace();
             return;

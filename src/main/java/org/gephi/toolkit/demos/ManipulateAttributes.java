@@ -21,6 +21,7 @@ along with Gephi.  If not, see <http://www.gnu.org/licenses/>.
 package org.gephi.toolkit.demos;
 
 import java.io.File;
+import java.util.Iterator;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
@@ -43,6 +44,8 @@ import org.openide.util.Lookup;
  * @author Mathieu Bastian
  */
 public class ManipulateAttributes {
+
+    private static final int MAX_PRINTED_VALUES = 5;
 
     public void script() {
         //Init a project - and therefore a workspace
@@ -84,13 +87,15 @@ public class ManipulateAttributes {
 
         //Iterate values - fastest
         Column sourceCol = model.getNodeTable().getColumn("source");
-        for (Node n : model.getGraph().getNodes()) {
-            System.out.println(n.getAttribute(sourceCol));
+        Iterator<Node> nodes = model.getGraph().getNodes().iterator();
+        for (int count = 0; count < MAX_PRINTED_VALUES && nodes.hasNext(); count++) {
+            System.out.println(nodes.next().getAttribute(sourceCol));
         }
 
         //Iterate values - normal
-        for (Node n : model.getGraph().getNodes()) {
-            System.out.println(n.getAttribute("source"));
+        nodes = model.getGraph().getNodes().iterator();
+        for (int count = 0; count < MAX_PRINTED_VALUES && nodes.hasNext(); count++) {
+            System.out.println(nodes.next().getAttribute("source"));
         }
     }
 }
