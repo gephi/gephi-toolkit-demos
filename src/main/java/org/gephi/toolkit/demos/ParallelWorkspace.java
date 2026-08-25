@@ -20,7 +20,6 @@ along with Gephi.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gephi.toolkit.demos;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -98,9 +97,11 @@ public class ParallelWorkspace {
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
             pc.openWorkspace(workspace1);
-            ec.exportFile(new File("parallel_worspace1.pdf"));
+            DemoPreview.configureStraightEdges();
+            ec.exportFile(DemoOutput.file("parallel_worspace1.pdf"));
             pc.openWorkspace(workspace2);
-            ec.exportFile(new File("parallel_worspace2.pdf"));
+            DemoPreview.configureStraightEdges();
+            ec.exportFile(DemoOutput.file("parallel_worspace2.pdf"));
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
             return;
