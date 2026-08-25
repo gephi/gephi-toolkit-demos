@@ -34,10 +34,9 @@ import org.openide.util.Lookup;
 public class ManualGraph {
 
     public void script() {
-        //Init a project - and therefore a workspace
+        //Create an empty workspace with its immutable graph configuration
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
+        Workspace workspace = pc.openNewWorkspace(Configuration.builder().build());
 
         //Get a graph model - it exists because we have a workspace
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);

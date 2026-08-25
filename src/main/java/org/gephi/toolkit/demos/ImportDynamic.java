@@ -31,7 +31,6 @@ import org.gephi.graph.api.types.TimestampIntegerMap;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.processor.plugin.MergeProcessor;
-import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 
@@ -80,11 +79,6 @@ import org.openide.util.Lookup;
 public class ImportDynamic {
 
     public void script() {
-        //Init a project - and therefore a workspace
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
-
         //Import first file
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
         Container[] containers = new Container[3];
@@ -98,11 +92,11 @@ public class ImportDynamic {
             return;
         }
 
-        //Process the container using the MergeProcessor
-        importController.process(containers, new MergeProcessor(), workspace);
+        //Let the processor create a correctly configured project/workspace
+        Workspace workspace = importController.process(containers, new MergeProcessor(), null)[0];
 
         //Get the price attribute
-        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel();
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
         Graph graph = graphModel.getGraph();
         for (Node n : graph.getNodes()) {
             TimestampIntegerMap value = (TimestampIntegerMap) n.getAttribute("price");
