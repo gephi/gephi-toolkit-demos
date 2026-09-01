@@ -50,6 +50,11 @@ public class LabelItem implements Item {
     }
 
     @Override
+    public boolean hasData(String key) {
+        return false;
+    }
+
+    @Override
     public void setData(String key, Object value) {
     }
 

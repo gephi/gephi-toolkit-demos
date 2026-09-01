@@ -31,7 +31,6 @@ import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.generator.plugin.RandomGraph;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
-import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.layout.plugin.AutoLayout;
 import org.gephi.layout.plugin.force.StepDisplacement;
 import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
@@ -60,10 +59,7 @@ import org.openide.util.Lookup;
 public class ParallelWorkspace {
 
     public void script() {
-        //Init a project - and therefore a workspace
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        final Workspace workspace1 = pc.getCurrentWorkspace();
 
         //Generate a new random graph into a container
         Container container = Lookup.getDefault().lookup(Container.Factory.class).newContainer();
@@ -72,9 +68,9 @@ public class ParallelWorkspace {
         randomGraph.setWiringProbability(0.005);
         randomGraph.generate(container.getLoader());
 
-        //Append container to graph structure
+        //Create a correctly configured project/workspace and process the graph
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
-        importController.process(container, new DefaultProcessor(), workspace1);
+        final Workspace workspace1 = importController.process(container);
 
         //Duplicate this workspace
         final Workspace workspace2 = pc.duplicateWorkspace(workspace1);

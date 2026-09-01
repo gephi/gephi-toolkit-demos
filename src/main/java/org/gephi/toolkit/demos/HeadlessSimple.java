@@ -42,13 +42,11 @@ import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.EdgeDirectionDefault;
 import org.gephi.io.importer.api.ImportController;
-import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.layout.plugin.force.StepDisplacement;
 import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.types.EdgeColor;
-import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
@@ -75,18 +73,8 @@ import org.openide.util.Lookup;
 public class HeadlessSimple {
 
     public void script() {
-        //Init a project - and therefore a workspace
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
-
-        //Get models and controllers for this new workspace - will be useful later
-        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel();
-        PreviewModel model = DemoPreview.configureStraightEdges();
+        //Get controllers
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
-        FilterController filterController = Lookup.getDefault().lookup(FilterController.class);
-        AppearanceController appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
-        AppearanceModel appearanceModel = appearanceController.getModel();
 
         //Import file       
         Container container;
@@ -99,8 +87,15 @@ public class HeadlessSimple {
             return;
         }
 
-        //Append imported data to GraphAPI
-        importController.process(container, new DefaultProcessor(), workspace);
+        //Create a correctly configured project/workspace and process the import
+        Workspace workspace = importController.process(container);
+
+        //Get models and controllers for the new workspace
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        PreviewModel model = DemoPreview.configureStraightEdges();
+        FilterController filterController = Lookup.getDefault().lookup(FilterController.class);
+        AppearanceController appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
+        AppearanceModel appearanceModel = appearanceController.getModel(workspace);
 
         //See if graph is well imported
         DirectedGraph graph = graphModel.getDirectedGraph();
@@ -156,7 +151,7 @@ public class HeadlessSimple {
         //Preview
         model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(Color.GRAY));
-        model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, new Float(0.1f));
+        model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, 0.1f);
         model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8));
 
         //Export

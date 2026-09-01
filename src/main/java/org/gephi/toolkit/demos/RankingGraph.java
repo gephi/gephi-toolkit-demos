@@ -38,12 +38,10 @@ import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.EdgeDirectionDefault;
 import org.gephi.io.importer.api.ImportController;
-import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.layout.plugin.AutoLayout;
 import org.gephi.layout.plugin.forceAtlas.ForceAtlasLayout;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
-import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
@@ -65,16 +63,8 @@ import org.openide.util.Lookup;
 public class RankingGraph {
 
     public void script() {
-        //Init a project - and therefore a workspace
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
-
-        //Get controllers and models
+        //Get controllers
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
-        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel();
-        AppearanceController appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
-        AppearanceModel appearanceModel = appearanceController.getModel();
 
         //Import file
         Container container;
@@ -87,8 +77,13 @@ public class RankingGraph {
             return;
         }
 
-        //Append imported data to GraphAPI
-        importController.process(container, new DefaultProcessor(), workspace);
+        //Create a correctly configured project/workspace and process the import
+        Workspace workspace = importController.process(container);
+
+        //Get models for the new workspace
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        AppearanceController appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
+        AppearanceModel appearanceModel = appearanceController.getModel(workspace);
 
         //See if graph is well imported
         DirectedGraph graph = graphModel.getDirectedGraph();

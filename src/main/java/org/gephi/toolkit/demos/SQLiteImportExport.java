@@ -37,10 +37,8 @@ import org.gephi.io.importer.api.EdgeDirectionDefault;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.plugin.database.EdgeListDatabaseImpl;
 import org.gephi.io.importer.plugin.database.ImporterEdgeList;
-import org.gephi.io.processor.plugin.DefaultProcessor;
 import org.gephi.layout.plugin.force.StepDisplacement;
 import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
-import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 
@@ -64,14 +62,8 @@ import org.openide.util.Lookup;
 public class SQLiteImportExport {
 
     public void script() {
-        //Init a project - and therefore a workspace
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
-
-        //Get controllers and models
+        //Get controllers
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
-        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
 
         //Copy the example database to the demo output directory
         File temp;
@@ -96,8 +88,9 @@ public class SQLiteImportExport {
         container.getLoader().setAllowAutoNode(false);      //Don't create missing nodes
         container.getLoader().setEdgeDefault(EdgeDirectionDefault.UNDIRECTED);   //Force UNDIRECTED
 
-        //Append imported data to GraphAPI
-        importController.process(container, new DefaultProcessor(), workspace);
+        //Create a correctly configured project/workspace and process the import
+        Workspace workspace = importController.process(container);
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
 
         //See if graph is well imported
         UndirectedGraph graph = graphModel.getUndirectedGraph();
