@@ -4,7 +4,7 @@
 
     <groupId>org.gephi</groupId>
     <artifactId>toolkit-demos</artifactId>
-    <version>0.11.2</version>
+    <version>0.11.4</version>
     <build>
         <plugins>
             <plugin>
